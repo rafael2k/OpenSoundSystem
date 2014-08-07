@@ -598,17 +598,17 @@ oss_untimeout (timeout_id_t id)
 
 
 caddr_t
-oss_map_pci_mem (oss_device_t * osdev, int nr, int phaddr, int size)
+oss_map_pci_mem (oss_device_t * osdev, int nr, phys_addr_t phaddr, int size)
 {
   status_t err;
   void *va = NULL;
-  FENTRYA("%p,%d,%u,%d", osdev, nr, phaddr, size);
+  FENTRYA("%p,%d,%Lx,%d", osdev, nr, (uint64)phaddr, size);
   //XXX:align phaddr ?
   /* round up to page size */
   size += B_PAGE_SIZE - 1;
   size &= ~(B_PAGE_SIZE - 1);
   
-  err = map_physical_memory(OSS_PCI_AREA_NAME, (void *)phaddr, size, 
+  err = map_physical_memory(OSS_PCI_AREA_NAME, phaddr, size,
                             B_ANY_KERNEL_BLOCK_ADDRESS, 0, &va);
   if (err < B_OK)
     va = NULL;
