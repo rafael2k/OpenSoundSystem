@@ -101,6 +101,9 @@ typedef uint32 oss_native_word;	/* Same as the address and status register size 
 typedef int64 oss_int64_t;		/* Signed 64 bit integer */
 typedef uint64 oss_uint64_t;	/* Unsigned 64 bit integer */
 typedef unsigned long offset_t;
+#ifndef __HAIKU__
+typedef uint32 phys_addr_t;
+#endif
 
 
 extern void oss_cmn_err (int level, char *format, ...);
@@ -408,8 +411,8 @@ typedef struct _oss_poll_event_t oss_poll_event_t;
 extern int detect_trace;
 #define DDB(x) if (detect_trace) x
 
-extern caddr_t oss_map_pci_mem (oss_device_t * osdev, int nr, int phaddr,
-				int size);
+extern caddr_t oss_map_pci_mem (oss_device_t * osdev, int nr,
+				phys_addr_t phaddr, int size);
 extern void oss_unmap_pci_mem (void *addr);
 #define MAP_PCI_IOADDR(osdev, nr, io) (oss_native_word)io
 #define MAP_PCI_MEM(osdev, ix, phaddr, size) 	oss_map_pci_mem(osdev, ix, phaddr, size)
