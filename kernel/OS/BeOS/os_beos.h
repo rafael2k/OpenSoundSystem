@@ -201,7 +201,13 @@ extern void debug_mutex_exit (oss_mutex_t * mutex, char *file, int line, oss_nat
 #define MUTEX_EXIT(mutex, flags)			debug_mutex_exit(&mutex, __FILE__, __LINE__, NULL)
 #else
 typedef spinlock oss_mutex_t;
-#define MUTEX_INIT(osdev, mutex, hier)			{ mutex = 0; }
+#ifndef __HAIKU__
+/* Haiku defines a specific initializer now, BeOS just used 0. */
+#define B_SPINLOCK_INITIALIZER 0
+#endif
+/* gcc2 does not like this:
+#define MUTEX_INIT(osdev, mutex, hier)			{ mutex = B_SPINLOCK_INITIALIZER; }*/
+#define MUTEX_INIT(osdev, mutex, hier)			{ const spinlock s = B_SPINLOCK_INITIALIZER; mutex = s; }
 #define MUTEX_CLEANUP(mutex)			
 #define MUTEX_ENTER_IRQDISABLE(mutex, flags)	\
 { \
