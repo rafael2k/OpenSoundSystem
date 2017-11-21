@@ -70,7 +70,11 @@ benaphore osscore_benaphore;
 
 #define DEBUG_IRQ 1
 #if DEBUG_IRQ
+#ifdef __HAIKU__
+int32 irq_count = 0;
+#else
 vint32 irq_count = 0;
+#endif
 #endif
 
 volatile int oss_open_devices = 0;
