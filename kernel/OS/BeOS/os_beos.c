@@ -245,7 +245,11 @@ oss_virt_to_bus (void *addr)
     }
   //XXX:which???
   //return (oss_native_word)pent[0].address;
-  return (oss_native_word)(gPCI->ram_address(pent[0].address));
+  //XXX: ram_address historically takes a void* which isn't the same size...
+  // check for overflow, then we just return it, on x86 it's a noop anyway
+  if (sizeof(const void *) < sizeof(phys_addr_t) && ((addr_t)pent[0].address != pent[0].address))
+    return (oss_native_word)pent[0].address;
+  return (oss_native_word)(gPCI->ram_address((const void *)(addr_t)pent[0].address));
 }
 
 
