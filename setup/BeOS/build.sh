@@ -3,8 +3,8 @@
 . ./.directories
 
 # default is to install as user addons
-BEOS_SYSTEM="${BEOS_SYSTEM:-home/config}"
-DRIVER_SETTINGS="${DRIVER_SETTINGS:-home/config/settings/kernel/drivers}"
+BEOS_SYSTEM="${BEOS_SYSTEM:-boot/home/config}"
+DRIVER_SETTINGS="${DRIVER_SETTINGS:-boot/home/config/settings/kernel/drivers}"
 
 # the path to the kernel binary we can link to
 if [ $OSTYPE = "haiku" ]; then
