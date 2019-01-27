@@ -134,8 +134,8 @@ oss_contig_malloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
   size += B_PAGE_SIZE - 1;
   size &= ~(B_PAGE_SIZE - 1);
 
-  if ((err = id = create_area(OSS_CONTIG_AREA_NAME, &p, B_ANY_KERNEL_ADDRESS,
-                         size, lock, 0)) < B_OK)
+  if ((err = id = create_area(OSS_CONTIG_AREA_NAME, &p, B_ANY_KERNEL_ADDRESS, \
+			size, lock, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA )) < B_OK)
     {
       cmn_err (CE_WARN, "create_area() failed\n");
       return NULL;
@@ -616,8 +616,9 @@ oss_map_pci_mem (oss_device_t * osdev, int nr, phys_addr_t phaddr, int size)
   size += B_PAGE_SIZE - 1;
   size &= ~(B_PAGE_SIZE - 1);
   
-  err = map_physical_memory(OSS_PCI_AREA_NAME, phaddr, size,
-                            B_ANY_KERNEL_BLOCK_ADDRESS, 0, &va);
+  err = map_physical_memory(OSS_PCI_AREA_NAME, phaddr, size, \
+			B_ANY_KERNEL_BLOCK_ADDRESS, \
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA, &va);
   if (err < B_OK)
     va = NULL;
   FEXITR((uint32)va);
