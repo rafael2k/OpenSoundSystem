@@ -105,13 +105,18 @@ rm target/modules/oss_midiloop.o
 # try to build all in a single bin for now...
 # driver_beos.o shouldn' be in, oh well...
 # R5 has symbols like __ucmpdi2 but not Haiku, so use libgcc
-gcc -o $core target/objects/*.o target/modules/*.o -nostdlib -lgcc $KERNEL || exit 1
+gcc -fno-strict-aliasing -fno-delete-null-pointer-checks -fno-builtin-fork -fno-builtin-vfork \
+	-shared -nostdlib -Xlinker -soname=$core -z max-page-size=0x1000 -o $core \
+	target/objects/*.o target/modules/*.o $KERNEL -lgcc || exit 1
 setvermime $core
 
 # except the loader driver...
 # using the same bin works in BeOS but not in Haiku.
 drv=prototype/$BEOS_SYSTEM/add-ons/kernel/drivers/bin/${DRVPREFIX}loader
-gcc -o $drv target/objects/driver_beos.o -nostdlib $KERNEL || exit 1
+gcc -fno-strict-aliasing -fno-delete-null-pointer-checks -fno-builtin-fork -fno-builtin-vfork \
+	-shared -nostdlib -Xlinker -soname=$drv -z max-page-size=0x1000 -o $drv \
+	target/objects/driver_beos.o \
+	$KERNEL -lgcc || exit 1
 setvermime $drv
 
 rm -f devlist.txt
