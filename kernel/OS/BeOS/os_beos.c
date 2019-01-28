@@ -312,13 +312,13 @@ oss_uiomove (void *address, size_t nbytes, enum uio_rw rwflag, uio_t * uio)
   switch (rwflag)
     {
     case UIO_READ:
-      //XXX:user_memcpy...
-      memcpy (uio->ptr, address, nbytes);
+      if (user_memcpy (uio->ptr, address, nbytes) < B_OK)
+		return B_BAD_ADDRESS;
       break;
 
     case UIO_WRITE:
-      //XXX:user_memcpy...
-      memcpy (address, uio->ptr, nbytes);
+      if (user_memcpy (address, uio->ptr, nbytes) < B_OK)
+		return B_BAD_ADDRESS;
       break;
     }
 
@@ -2130,8 +2130,8 @@ ossdrv_ioctl(ossdev_cookie_t *cookie, uint32 op, void *buffer, size_t length)
 
       if ((cmd & SIOC_IN) && len > 0)
 	{
-	  memcpy (buf, buffer, len);
-	    //return EFAULT;
+	  if (user_memcpy (buf, buffer, len) < B_OK)
+		return B_BAD_ADDRESS;
 	}
 
     }
@@ -2140,8 +2140,8 @@ ossdrv_ioctl(ossdev_cookie_t *cookie, uint32 op, void *buffer, size_t length)
 
   if ((cmd & SIOC_OUT) && len > 0)
     {
-      memcpy (buffer, buf, len);
-	//return EFAULT;
+      if (user_memcpy (buffer, buf, len) < B_OK)
+		return B_BAD_ADDRESS;
     }
 
 
