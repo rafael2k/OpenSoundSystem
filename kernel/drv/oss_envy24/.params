@@ -49,9 +49,9 @@ int envy24_devmask = 65535;
 int envy24_realencoder_hack = 0;
 /*
  * envy24_realencoder_hack: Older versions of realencoder expect a mixer device
- * for each audio device file. This option makes OSS to create dummy micers to
+ * for each audio device file. This option makes OSS to create dummy mixers to
  * make realencoder happy.
- * Values: 0=normal (default), 1=create dmmy mixers.
+ * Values: 0=normal (default), 1=create dummy mixers.
  */
 int envy24_gain_sliders = 0;
 /*

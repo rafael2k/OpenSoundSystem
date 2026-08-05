@@ -1,0 +1,35 @@
+NAME lynxtwo - OSS driver for LynxTWO
+  family of professional audio devices.DESCRIPTION
+  Open Sound System driver for LynxTWO
+  / Lynx AES16 family of professional
+  audio controllers.
+  The LynxTWO driver is based on the same "HAL" code used by the Windows and
+  Mac drivers.
+  For that reason the functionality is practically identical with them.
+  However the
+interface (API)
+to applications is 100 %
+       pure OSS so practically all OSS compatible applications will work with the driver.FURTHER DOCUMENTATION Please consult the User 's Guide for Windows/MacOS for more info about this
+device and it' s control panel.Most of this information is valid for OSS too.
+       USAGE Just like in Windows / Mac there are 8 playback device files and 8 recording device files available to the applications.To find out the actual device numbering you need to take a look at the printout produced by "ossinfo -a" command.
+       The routings between these rcording and playback devices are handled by the on board mixer.Due to size of the mixer there are three OSS mixer devices.You can change the mixer / control panel settings using the ossxmix program included in the OSS package.
+       The actual device numbering will be different if you have some other audio devices in your system.However by defaut you can access the mixers with:ossxmix - d0 (Adapter window)
+       ossxmix - d1 (Record / Play window) ossxmix -
+    d2 (Outputs window) Please refer to the LynxTwo Installation and Users
+Guide (shipped with the card) for more information about the mixer windows.There may be some differences between the
+Windows /
+Mac driver and OSS but mostly the information given in this guide is valid for OSS too.
+OPTIONS None LIMITATIONS The following features are missing from this LynxTWO driver version.Some of them will be automatically implemented in near future.Some of them will be implemented only
+if somebody needs them.o The LStream 2 port is not supported.o The C and D inputs of the output mixer channels are not supported.o The LTC generator /
+detector is not supported.o Digital output status bits are not changeable.o The ossxmix mixer screen require at least 1200 x1600 display resolution to fit on the screen.
+It 's possible to use smaller screen resolutions but
+  all controls will not fit on the screen at the same time.
+
+FILES
+CONFIGFILEPATH/lynxtwo.conf Device configuration file
+
+AUTHOR
+4Front Technologies
+
+
+

@@ -18,7 +18,7 @@ OFF will allow you to play audio but only at a fixed rate set via vmixctl
 (Default: 48Khz).
 
 FILES
-CONFIGFILEPATH/oss_geode.conf Device configuration file
+CONFIGFILEPATH/oss_geode.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

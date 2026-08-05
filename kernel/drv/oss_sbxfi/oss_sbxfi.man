@@ -14,7 +14,7 @@ o sbxfi_type	Override X-Fi type autodetection. Values:
 		Default : 0.
 
 FILES
-CONFIGFILEPATH/oss_sbxfi.conf Device configuration file.
+CONFIGFILEPATH/oss_sbxfi.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

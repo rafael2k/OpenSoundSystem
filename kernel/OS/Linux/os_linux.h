@@ -11,7 +11,17 @@
  * This means that some definitions found in os.h under some other operating
  * systems may be in wrap.h under Linux.
  */
-#define COPYING9 Copyright (C) Hannu Savolainen and Dev Mazumdar 2000-2007. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #define OS_VERSION "2.6.x"
 #define __EXTENDED__
@@ -109,7 +119,7 @@ struct _oss_device_t
 /* System wall timer access */
 #define GET_JIFFIES()	oss_get_jiffies()
 
-extern inline unsigned int
+__attribute__ ((gnu_inline)) extern inline unsigned int
 __inb (unsigned short port)
 {
   unsigned int _v;
@@ -117,7 +127,7 @@ __inb (unsigned short port)
 			"0" (0));
   return _v;
 }
-extern inline unsigned int
+__attribute__ ((gnu_inline)) extern inline unsigned int
 __inw (unsigned short port)
 {
   unsigned int _v;
@@ -125,7 +135,7 @@ __inw (unsigned short port)
 			"0" (0));
   return _v;
 }
-extern inline unsigned int
+__attribute__ ((gnu_inline)) extern inline unsigned int
 __inl (unsigned short port)
 {
   unsigned int _v;
@@ -133,19 +143,19 @@ __inl (unsigned short port)
   return _v;
 }
 
-extern inline void
+__attribute__ ((gnu_inline)) extern inline void
 __outb (unsigned char value, unsigned short port)
 {
   __asm__ __volatile__ ("out" "b" " %" "b" "0,%" "w" "1"::"a" (value),
 			"d" (port));
 }
-extern inline void
+__attribute__ ((gnu_inline)) extern inline void
 __outw (unsigned short value, unsigned short port)
 {
   __asm__ __volatile__ ("out" "w" " %" "w" "0,%" "w" "1"::"a" (value),
 			"d" (port));
 }
-extern inline void
+__attribute__ ((gnu_inline)) extern inline void
 __outl (unsigned int value, unsigned short port)
 {
   __asm__ __volatile__ ("out" "l" " %" "0,%" "w" "1"::"a" (value),

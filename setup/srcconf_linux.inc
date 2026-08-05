@@ -51,20 +51,20 @@ add_kernel_flags (FILE * f)
 {
 # if defined(__x86_64__)
   fprintf (f,
-	     "CFLAGS += -O3 -fno-common  -mcmodel=kernel -mno-red-zone  -fno-asynchronous-unwind-tables -ffreestanding%s\n", fnsp);
+	     "CFLAGS += -O2 -fno-common -mcmodel=kernel -mno-red-zone -fno-tree-slp-vectorize -fno-pie -fno-asynchronous-unwind-tables -ffreestanding%s\n", fnsp);
 # else
 #   ifndef __arm__
   if (getenv ("NO_REGPARM") == NULL)
 	{
 	  fprintf (f,
-		   "CFLAGS += -O3 -fno-common -ffreestanding -mregparm=3 -DUSE_REGPARM%s\n", fnsp);
+		   "CFLAGS += -O2 -fno-common -ffreestanding -mregparm=3 -DUSE_REGPARM%s\n", fnsp);
 	}
   else
 	{
-	  fprintf (f, "CFLAGS += -O3 -fno-common -ffreestanding -DNO_REGPARM%s\n", fnsp);
+	  fprintf (f, "CFLAGS += -O2 -fno-common -ffreestanding -DNO_REGPARM%s\n", fnsp);
 	}
 #   else
-  fprintf (f, "CFLAGS += -O3 -fno-common -ffreestanding%s\n", fnsp);
+  fprintf (f, "CFLAGS += -O2 -fno-common -ffreestanding%s\n", fnsp);
 #   endif
 # endif
 }

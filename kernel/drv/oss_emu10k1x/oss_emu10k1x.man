@@ -20,7 +20,7 @@ When set as SPDIF, you can get play PCM/AC3 audio to a Dolby(R) capable
 receiver.
 
 FILES
-CONFIGFILEPATH/oss_emu10k1x.conf Device configuration file
+CONFIGFILEPATH/oss_emu10k1x.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

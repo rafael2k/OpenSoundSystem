@@ -132,12 +132,12 @@ do
 	if test -f $SRCDIR/kernel/drv/$N/$N.man
 	then
 	  sed "s:CONFIGFILEPATH:$OSSLIBDIR/conf:g" < $SRCDIR/kernel/drv/$N/$N.man > /tmp/ossman.txt
-	  $TXT2MAN -t "$CMD" -v "OSS Devices" -s 7 /tmp/ossman.txt | gzip -9 > prototype/usr/share/man/man7/$N.7.gz
+	  $TXT2MAN -t "$N" -v "OSS Devices" -s 7 /tmp/ossman.txt | gzip -9 > prototype/usr/share/man/man7/$N.7.gz
 	else
 		if test -f $SRCDIR/kernel/nonfree/drv/$N/$N.man
 		then
 	  		sed "s:CONFIGFILEPATH:$OSSLIBDIR/conf:g" < $SRCDIR/kernel/nonfree/drv/$N/$N.man > /tmp/ossman.txt
-	  		$TXT2MAN -t "$CMD" -v "OSS Devices" -s 7 $SRCDIR/kernel/nonfree/drv/$N/$N.man | gzip -9 > prototype/usr/share/man/man7/$N.7.gz
+	  		$TXT2MAN -t "$N" -v "OSS Devices" -s 7 /tmp/ossman.txt | gzip -9 > prototype/usr/share/man/man7/$N.7.gz
 		fi
 	fi
 done

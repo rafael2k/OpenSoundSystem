@@ -49,7 +49,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_cmpci.conf Device configuration file
+CONFIGFILEPATH/oss_cmpci.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

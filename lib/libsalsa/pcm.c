@@ -359,7 +359,7 @@ snd_pcm_frames_to_bytes (snd_pcm_t * pcm, snd_pcm_sframes_t frames)
 snd_pcm_sframes_t
 snd_pcm_bytes_to_frames (snd_pcm_t * pcm, ssize_t bytes)
 {
-  dbg_printf3 ("snd_pcm_bytes_to_frames(%d)=%d\n", bytes,
+  dbg_printf3 ("snd_pcm_bytes_to_frames(%ld)=%ld\n", bytes,
 	       bytes / pcm->frame_size);
   return bytes / pcm->frame_size;
 }
@@ -547,7 +547,7 @@ __snd_pcm_hw_params_set_buffer_size_near (snd_pcm_t * pcm,
 					  snd_pcm_hw_params_t * params,
 					  snd_pcm_uframes_t * val)
 {
-  dbg_printf ("snd_pcm_hw_params_set_buffer_size_near(%d)\n", *val);
+  dbg_printf ("snd_pcm_hw_params_set_buffer_size_near(%ld)\n", *val);
   return 0;
 }
 
@@ -646,7 +646,7 @@ int INTERNAL (snd_pcm_hw_params_get_format) (const snd_pcm_hw_params_t *
 					     params,
 					     snd_pcm_format_t * format)
 {
-  dbg_printf ("snd_pcm_hw_params_get_format(params=%x)\n", params);
+  dbg_printf ("snd_pcm_hw_params_get_format(params=%lx)\n", params);
 
   *format = params->fmt;
 }
@@ -686,7 +686,7 @@ snd_pcm_hw_params_set_periods (snd_pcm_t * pcm, snd_pcm_hw_params_t * params,
 			       unsigned int val, int dir)
 {
   dbg_printf
-    ("snd_pcm_hw_params_set_periods(pcm=%x, params=%x, val=%d, dir=%d)\n",
+    ("snd_pcm_hw_params_set_periods(pcm=%lx, params=%lx, val=%ld, dir=%ld)\n",
      pcm, params, val, dir);
   pcm->periods = val;
 

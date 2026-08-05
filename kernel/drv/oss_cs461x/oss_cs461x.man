@@ -17,7 +17,7 @@ the audio device.
 
 
 FILES
-CONFIGFILEPATH/oss_cs461x.conf Device configuration file
+CONFIGFILEPATH/oss_cs461x.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

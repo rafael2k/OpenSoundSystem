@@ -9,7 +9,7 @@ M-Audio Delta Series, Terratec EWS88 Series, Hoontech DSP24.
 
 o 8/16 bit playback/record
 o mono/stereo/4ch/5.1ch/7.1ch playback
-o mono/sterero recording 
+o mono/stereo recording 
 o 8KHz to 192Khz sample rate.
 
  ENVY24 AUDIO DEVICES
@@ -42,7 +42,7 @@ o 8KHz to 192Khz sample rate.
 
 
 The actual /dev/dsp# numbers may be different on your system. Check the right
-ones by looking at the output procuced by "ossinfo -a" command. With the
+ones by looking at the output produced by "ossinfo -a" command. With the
 above configuration you can use /dev/dsp0 to /dev/dsp4 for playback of stereo
 streams. If you play mono files the signal will be output only from the left
 channel. /dev/dsp0 to /dev/dsp3 are connected to the analog outputs while
@@ -327,7 +327,7 @@ not be used.
 Values: 1, 0 Default: 0
 
 FILES
-CONFIGFILEPATH/oss_envy24.conf Device configuration file
+CONFIGFILEPATH/oss_envy24.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

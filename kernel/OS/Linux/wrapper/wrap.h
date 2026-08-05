@@ -6,7 +6,17 @@
  * modified in the target system because the precompiled binaries included
  * in the OSS installation package depend on it too.
  */
-#define COPYING12 Copyright (C) Hannu Savolainen and Dev Mazumdar 2000-2014. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 /*
  * Some integer types
@@ -118,7 +128,9 @@ extern void *oss_contig_malloc (oss_device_t * osdev, int sz,
 				oss_native_word * phaddr);
 extern void oss_contig_free (oss_device_t * osdev, void *p, int sz);
 
-extern time_t oss_get_time (void);
+typedef unsigned long oss_time_t;
+
+extern oss_time_t oss_get_time (void);
 
 typedef struct _inode_handle_t oss_inode_handle_t;
 typedef struct _vm_aread_handle oss_vm_area_handle_t;

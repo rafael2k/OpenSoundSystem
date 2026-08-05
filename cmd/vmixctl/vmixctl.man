@@ -55,7 +55,7 @@ o	vmixctl attach /dev/oss/oss_envy240/pcm0
 o	vmixctl attach /dev/oss/oss_envy240/pcm0 /dev/oss/oss_envy240/pcmin0
 
 SETTING THE SAMPLING RATE USED BY VMIX
-The virtual mixer subsystem will set the physical audio devce(s) to use
+The virtual mixer subsystem will set the physical audio device(s) to use
 fixed sampling rate that is 48000 Hz by default. It is possible to use
 "vmixctl rate audiodev" to switch vmix to use some different rate with this
 device (pair). You should use "ossinfo -a -v2" to verify that the sampling rate
@@ -66,7 +66,7 @@ The "audiodev" parameter is the device file name (see ossinfo -a) that is
 used for playback. The input device name doesn't need to be specified.
 
 Note that some professional audio devices may be locked to external sampling
-rate or some fixed rate (defined in ossmix/ossxmis). In such case the rate is
+rate or some fixed rate (defined in ossmix/ossxmix). In such case the rate is
 not changeable by vmixctl.
 
  EXAMPLE

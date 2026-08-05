@@ -179,7 +179,11 @@ then
 fi
 
 cp -f ../objects/osscore.o osscore_mainline.o
+touch .osscore_mainline.o.cmd
+rm -f osscore_lnk.c
+ln -s osscore.c osscore_lnk.c
 
+rm -f Module.symvers
 rm -f Makefile
 ln -s Makefile.osscore Makefile
 
@@ -203,14 +207,12 @@ then
 	exit 3
 fi
 
-if ! $LD -r osscore.ko osscore_mainline.o -o /lib/modules/$UNAME/kernel/oss/osscore.ko
-then
-	echo Linking the osscore module failed
-	exit 5
-fi
+cp -f osscore.ko /lib/modules/$UNAME/kernel/oss/
+rm -f osscore_lnk.c
 
 if test -f Module.symvers
 then
+	cp -f Module.symvers Module_Symvers
 	#Take generated symbol information and add it to module.inc
 	echo "static const struct modversion_info ____versions[]" > osscore_symbols.inc
 	echo " __attribute__((used))" >> osscore_symbols.inc
@@ -228,10 +230,12 @@ do
 	N=`basename $n .o`
 	echo Building module $N 
 
-	rm -f $N_mainline.o Makefile
+	rm -f $N\_mainline.o  $N\_lnk.c Makefile
 
-	sed "s/MODNAME/$N/" < Makefile.tmpl > Makefile
-	ln -s $n $N_mainline.o
+	sed "s/MODNAME/$N/g" < Makefile.tmpl > Makefile
+	ln -s $N.c $N\_lnk.c
+	ln -s $n $N\_mainline.o
+	touch .$N\_mainline.o.cmd
 
 	if ! make KERNELDIR=$KERNELDIR > build.list 2>&1
 	then
@@ -240,17 +244,15 @@ do
 		exit 4
 	fi
 
-	if ! $LD -r $N.ko $N_mainline.o -o /lib/modules/$UNAME/kernel/oss/$N.ko
-	then
-		echo Linking $N module failed
-		exit 6
-	fi
-
-	rm -f $N_mainline.o
+	cp -f $N.ko /lib/modules/$UNAME/kernel/oss/
+	rm -f $N\_mainline.o
+	rm -f .$N\_mainline.o.cmd
+	rm -f $N\_lnk.c
 	make clean
 done 
 
 rm -f Makefile
+rm -f Module_Symvers
 
 echo "depmod -a"
 depmod -a

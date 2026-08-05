@@ -54,7 +54,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_digi96.conf Device configuration file
+CONFIGFILEPATH/oss_digi96.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

@@ -31,7 +31,10 @@ typedef int *ioctl_arg;
 #include <linux/irq.h>
 #include <linux/sched.h>
 #include <linux/interrupt.h>
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3,10,0)
+#include <linux/cred.h>
 #include <linux/uidgid.h>
+#endif
 #undef strlen
 #undef strcpy
 #define strlen oss_strlen
@@ -79,7 +82,7 @@ static int nminors = 0;
 #define WK_SLEEP	0x08
 #define WK_SELECT	0x10
 
-time_t
+oss_time_t
 oss_get_time (void)
 {
 #if 1
@@ -288,10 +291,16 @@ static struct file_operations oss_proc_operations = {
   .read = oss_read_devfiles,
 };
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0)
 static struct file_operations fops = { 
  .owner = THIS_MODULE,
  .read = oss_read_devfiles,
 };
+#else
+static struct proc_ops fops = {
+ .proc_read = oss_read_devfiles,
+};
+#endif
 #endif
 
 
@@ -473,16 +482,12 @@ oss_get_pid (void)
 unsigned int
 oss_get_uid (void)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
-  return current->cred->uid.val;
-#else 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
   return __kuid_val(current->cred->uid);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
   return current->cred->uid;
 #else
   return current->uid;
-#endif
 #endif
   return 0;
 }
@@ -493,6 +498,9 @@ typedef struct tmout_desc
   int timestamp;
   void (*func) (void *);
   void *arg;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+  int data;
+#endif
 
   struct timer_list timer;
 } tmout_desc_t;
@@ -505,8 +513,16 @@ tmout_desc_t tmouts[MAX_TMOUTS] = { {0} };
 int timeout_random = 0x12123400;
 
 void
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+oss_timer_callback (struct timer_list *t)
+#else
 oss_timer_callback (unsigned long id)
+#endif
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+  tmout_desc_t *priv = container_of(t, typeof(*priv), timer);
+  int id = priv->data;
+#endif
   tmout_desc_t *tmout;
   int ix;
   void *arg;
@@ -565,10 +581,17 @@ oss_timeout (void (*func) (void *), void *arg, unsigned long long ticks)
   tmout->arg = arg;
   tmout->timestamp = id | (timeout_random & ~0xff);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+  tmout->data = id | (timeout_random & ~0xff);
+  timer_setup (&tmout->timer, oss_timer_callback, 0);
+#else
   init_timer (&tmout->timer);
+#endif
   tmout->timer.expires = jiffies + ticks;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,15,0)
   tmout->timer.data = id | (timeout_random & ~0xff);
   tmout->timer.function = oss_timer_callback;
+#endif
   add_timer (&tmout->timer);
 
   return id | (timeout_random & ~0xff);
@@ -677,7 +700,7 @@ oss_create_uio (uio_t * uio, char *buf, size_t count, uio_rw_t rw,
 void
 oss_cmn_err (int level, const char *s, ...)
 {
-  char tmp[1024], *a[6];
+  char tmp[920], *a[6];
   va_list ap;
   int i, n = 0;
 
@@ -1953,8 +1976,13 @@ oss_fp_save (short *envbuf, unsigned int flags[])
     }
   else
     {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,0,0)
       flags[1] = read_cr4 ();
       write_cr4 (flags[1] | 0x600);	/* Set OSFXSR & OSXMMEXCEPT */
+#else
+      flags[1] = __read_cr4 ();
+      __write_cr4 (flags[1] | 0x600);	/* Set OSFXSR & OSXMMEXCEPT */
+#endif
       FX_SAVE (envbuf);
       asm ("fninit");
       asm ("fwait");
@@ -1974,7 +2002,11 @@ oss_fp_restore (short *envbuf, unsigned int flags[])
   else
     {
       FX_RESTORE (envbuf);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,0,0)
       write_cr4 (flags[1]);	/* Restore cr4 */
+#else
+      __write_cr4 (flags[1]);	/* Restore cr4 */
+#endif
     }
   write_cr0 (flags[0]);		/* Restore cr0 */
 }

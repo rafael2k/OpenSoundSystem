@@ -1,4 +1,14 @@
-#define COPYING Copyright (C) Hannu Savolainen and Dev Mazumdar 2000-2014. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -952,7 +962,7 @@ printf("Symlink %s -> %s\n", source, target);
 #if defined(__SCO_VERSION__)
       fprintf (f, "CFLAGS=-O -D_KERNEL -D_DDI=8\n");
 #else
-      fprintf (f, "CFLAGS += -D_KERNEL\n");
+      fprintf (f, "CFLAGS += -D_KERNEL -fno-pic\n");
 #endif
 #ifdef HAVE_KERNEL_FLAGS
       add_kernel_flags (f);

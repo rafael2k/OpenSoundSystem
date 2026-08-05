@@ -1,10 +1,12 @@
 include /etc/oss.conf
 
 EXTRA_CFLAGS += -I${OSSLIBDIR}/include/internals -I${OSSLIBDIR}/include/sys
+KBUILD_EXTRA_SYMBOLS=$(PWD)/Module_Symvers
 
 ifneq ($(KERNELRELEASE),)
 
 	obj-m := MODNAME.o
+	MODNAME-objs := MODNAME_lnk.o MODNAME_mainline.o
 
 else
 

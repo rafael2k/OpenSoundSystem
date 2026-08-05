@@ -14,7 +14,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_cs4281.conf Device configuration file
+CONFIGFILEPATH/oss_cs4281.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

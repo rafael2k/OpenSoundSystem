@@ -2,7 +2,7 @@ int detect_trace=0;
 /*
  * Detect Trace will trace the audio device detection and operation. However
  * this feature should only be enabled when requested by the technical support
- * personnell.
+ * personnel.
  */
 int max_intrate=100;
 /*
@@ -12,7 +12,7 @@ int max_intrate=100;
  * applications (including games). However some special applications
  * may require lower latencies. In such cases a higher value such as 500 or 1000
  * may be needed. The minimum latency will be roughly 2/max_intrate
- * seconds. However the exactl latency depends on what the application has
+ * seconds. However the exact latency depends on what the application has
  * requested using ioctl(SNDCTL_DSP_SETFRAGMENT). A value of zero means
  * OSS doesn't try to limit interrupt rate.
  *
@@ -60,10 +60,10 @@ int ac97_recselect=0;
  */
 int cooked_enable=1;
 /*
- * By default OSS will let applications to use sampling rates and formats
- * that are not supported by the hardware. Instead OSS performs the necessary
- * format conversions in software. Applications that don't tolerate this kind
- * of conversions usually disable them by using features of the OSS API
+ * By default OSS will let applications use sampling rates and formats that
+ * are not supported by the hardware. Instead OSS performs the necessary
+ * format conversions in software. Applications that don't tolerate these
+ * kind of conversions usually disable them by using features of the OSS API
  * (SNDCTL_DSP_COOKEDMODE). If this option is set to 0 then the format
  * conversions will be disabled for all applications and devices unless the
  * application explicitly enables them. This option should not be changed
@@ -129,5 +129,5 @@ int mixer_muted=0;
  * noise. Set mixer_muted to 1 to use low default levels and to
  * 0 to select audible levels.
  *
- * Note that just few OSS drivers support this option.
+ * Note that just a few OSS drivers support this option.
  */

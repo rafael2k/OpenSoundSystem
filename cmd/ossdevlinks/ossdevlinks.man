@@ -8,7 +8,7 @@ DESCRIPTION
 The ossdevlinks utility creates and manages old style (legacy) device files
 for OSS audio, MIDI and mixer devices.
 
-In previous versioms OSS used "flat" device numbering for the device files
+In previous versions OSS used "flat" device numbering for the device files
 (for example /dev/dsp0 to /dev/dspN). OSS version 4.0 and later uses different
 naming scheme. The ossdevlinks utility is used to manage the legacy device
 names as symbolic links to the new style devices.

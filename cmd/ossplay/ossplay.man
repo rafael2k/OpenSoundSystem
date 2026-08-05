@@ -10,13 +10,13 @@ DESCRIPTION
 ossplay plays raw PCM, Microsoft RIFF (.wav), Sun ULaw (.au), Mac AIFF (.aif)
 and other types of audio files. By default the application will try to
 determine the audio file's format and play audio based on the stored
-inforation about sample format, number of channels and sampling rate.
+information about sample format, number of channels and sampling rate.
 
 OPTIONS
 -v		Verbose output. Multiple invocations increase the level
 		of verbosity.
 -q		Quiet (no information printed).
--l		Loop playback indefinately.
+-l		Loop playback indefinitely.
 -d<devname> 	Select <devname> as the device (eg -d/dev/dsp2).
 -s<rate> 	Select the playback rate for raw PCM audio (eg -s48000).
 -c<channels 	Select the number of channels 1=mono 2=stereo, 4, 6, 8, etc.

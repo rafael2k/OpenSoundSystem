@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #include <string.h>
 #include "alsa-symbols.h"
 #include <alsa/asoundlib.h>

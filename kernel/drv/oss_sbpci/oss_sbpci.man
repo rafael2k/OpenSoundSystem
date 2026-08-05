@@ -32,7 +32,7 @@ Certain models like the SB 4.1D/SB PCI128D have SPDIF output jacks and
 this setting enables the output device.
 
 FILES
-CONFIGFILEPATH/oss_sbpci.conf Device configuration file
+CONFIGFILEPATH/oss_sbpci.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

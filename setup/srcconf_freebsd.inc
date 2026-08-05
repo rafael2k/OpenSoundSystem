@@ -12,6 +12,6 @@ add_kernel_flags (FILE * f)
 {
 # if defined(__x86_64__)
   fprintf (f,
-	     "CFLAGS += -O3 -fno-common  -mcmodel=kernel -mno-red-zone  -fno-asynchronous-unwind-tables -ffreestanding\n");
+	     "CFLAGS += -O2 -fno-common  -mcmodel=kernel -mno-red-zone  -fno-asynchronous-unwind-tables -ffreestanding\n");
 # endif
 }

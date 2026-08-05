@@ -13,7 +13,7 @@ int imux_masterdev=-1;
  * Master physical device to use (ie attach IMUX to a specific soundcard)
  * -1 means automatically detect the device. Use the device index numbers
  * reported by ossinfo -a.
- * Values: 0-N 	Default: -1 (autodetec)
+ * Values: 0-N 	Default: -1 (autodetect)
  */
 
 int imux_rate=48000;

@@ -73,7 +73,7 @@ may fail to save the recorded data properly because of this. Use some
 other application (such as ossrecord) if this happens.
 
 FILES
-CONFIGFILEPATH/oss_audioloop.conf Device configuration file
+CONFIGFILEPATH/oss_audioloop.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

@@ -1,5 +1,5 @@
 NAME
-osspartysh - reverse "telnet" utility for OSs technical support 
+osspartysh - reverse "telnet" utility for OSS's technical support 
 
 SYNOPSIS
 osspartysh -d -p <port>  (by the support engineer)
@@ -7,9 +7,9 @@ osspartysh -h <support_host> -p <support_port>  (by the customer)
 
 DESCRIPTION
 
-The osspartysh is an utility that makes it possible to a remote suport
+The osspartysh is an utility that makes it possible for a remote support
 engineer to share the session with a customer. The session runs in customer's
-computer but both the customer and the support engineer can type comands
+computer but both the customer and the support engineer can type commands
 and see the output. It is possible to run commands like vi to edit files.
 
 There is limited chat mechanism based on the comments of the shell (bash)
@@ -20,7 +20,7 @@ SECURITY
 
 The osspartysh sessions are established in reverse way when compared to usual 
 remote terminal programs like ssh or telnet. This gives improved security
-for both sides. The actual internet connection is not crypted so it
+for both sides. The actual internet connection is not encrypted so it
 cannot be used for editing confidential files, etc. However there is no need to
 send passwords over internet since the protocol doesn't rely on them.
 
