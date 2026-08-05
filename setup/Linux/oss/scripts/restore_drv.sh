@@ -9,6 +9,7 @@ fi
 /usr/sbin/soundoff
 
 rm -rf /lib/modules/`uname -r`/kernel/oss
+[ $(ls -A /lib/modules/`uname -r`/extramodules) ] || rmdir /lib/modules/`uname -r`/extramodules
 
 if test -x /sbin/chkconfig 
 then /sbin/chkconfig oss off > /dev/null 2>&1
@@ -17,8 +18,6 @@ else
   then /usr/sbin/update-rc.d -f oss remove > /dev/null 2>&1
   fi
 fi
-
-rm -f /etc/init.d/oss
 
 if ! test -d /lib/modules/`uname -r`/kernel/sound
 then

@@ -198,7 +198,8 @@ fi
 
 if ! test -d /lib/modules/$UNAME/kernel/oss
 then
-  mkdir /lib/modules/$UNAME/kernel/oss
+  # --parents option required if extramodules does not exist.
+  mkdir --parents /lib/modules/$UNAME/kernel/oss
 fi
 
 if ! test -d /lib/modules/$UNAME/kernel/oss
@@ -286,38 +287,6 @@ then
    echo 
 fi
 
-if ! test -d /etc/init.d
-then
-  mkdir /etc/init.d
-fi
-
-rm -f /etc/init.d/oss /etc/rc.d/rc3.d/S89oss /etc/rc3.d/S89oss
-cp -f $OSSLIBDIR/etc/S89oss /etc/init.d/oss
-
-chmod 744 /etc/init.d/oss
-
-if test -x /sbin/chkconfig
-then
-  /sbin/chkconfig oss on        > /dev/null 2>&1
-else
- if test -x /usr/sbin/update-rc.d
- then
-   /usr/sbin/update-rc.d oss defaults > /dev/null 2>&1
- else
-  if test -d etc/rc.d/rc3.d
-  then
-    rm -f /etc/rc.d/rc3.d/S89oss
-    ln -s /etc/init.d/oss /etc/rc.d/rc3.d/S89oss
-  else
-    if test -d /etc/rc3.d
-    then
-      rm -f /etc/rc3.d/S89oss
-      ln -s /etc/init.d/oss /etc/rc3.d/S89oss
-    fi
-  fi
- fi
-fi
-
 # Install ALSA interface module (Cuckoo)
 #(cd $OSSLIBDIR/cuckoo && make clean) > /dev/null 2>&1
 #if (cd $OSSLIBDIR/cuckoo && make install) > /var/log/cuckoo.log 2>&1
@@ -339,11 +308,5 @@ if test ! -f $OSSLIBDIR/etc/userdefs
 then
   echo "autosave_mixer yes" > $OSSLIBDIR/etc/userdefs
 fi
-
-# Hal 0.5.0+ hotplug
-mkdir -p /usr/lib/hal/scripts
-ln -sf $OSSLIBDIR/scripts/oss_usb-create-devices /usr/lib/hal/scripts/
-mkdir -p /usr/share/hal/fdi/policy/20thirdparty/
-ln -sf $OSSLIBDIR/scripts/90-oss_usb-create-device.fdi /usr/share/hal/fdi/policy/20thirdparty/
 
 exit 0

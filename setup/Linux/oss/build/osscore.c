@@ -14,7 +14,7 @@ typedef int *ioctl_arg;
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/delay.h>
-#include <stdarg.h>
+#include <linux/stdarg.h>
 #include <linux/vmalloc.h>
 #include "timestamp.h"
 #include "local_config.h"
@@ -86,7 +86,7 @@ oss_time_t
 oss_get_time (void)
 {
 #if 1
-  return get_seconds ();
+  return ktime_get_real_seconds ();
 #else
   return xtime.tv_sec;
 #endif
@@ -113,7 +113,7 @@ oss_kmem_free (void *addr)
   vfree (addr);
 }
 
-/* oss_pmalloc() moved to os_linux.c */
+/* oss_pmalloc() moved to os_linux.c
 
 extern oss_native_word
 oss_virt_to_bus (void *addr)
@@ -121,6 +121,7 @@ oss_virt_to_bus (void *addr)
   return virt_to_bus (addr);
 }
 
+ */
 void *
 oss_memcpy (void *t_, const void *f_, size_t l)
 {
@@ -134,6 +135,9 @@ oss_memcpy (void *t_, const void *f_, size_t l)
   return t;
 }
 
+#ifdef memmove
+#undef memmove
+#endif
 void *memmove(void *dest, const void *src, size_t n)
 {
 	return oss_memcpy(dest, src, n);
@@ -908,7 +912,7 @@ oss_contig_malloc (oss_device_t * osdev, int buffsize, oss_uint64_t memlimit,
 			 (oss_native_word) end_addr);
     }
 
-  *phaddr = virt_to_bus (start_addr);
+  *phaddr = virt_to_phys(start_addr);
   return start_addr;
 }
 
@@ -1039,10 +1043,8 @@ alloc_fop (oss_device_t * osdev, struct oss_file_operation_handle *op)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0)
   fop->owner = osdev_get_owner (osdev);
 #endif
-#ifdef HAVE_UNLOCKED_IOCTL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,11)
   fop->unlocked_ioctl = tmp_unlocked_ioctl;
-#endif
-#ifdef HAVE_COMPAT_IOCTL
   fop->compat_ioctl = tmp_compat_ioctl;
 #endif
 
@@ -2089,7 +2091,7 @@ EXPORT_SYMBOL (oss_spin_unlock_irqrestore);
 EXPORT_SYMBOL (oss_udelay);
 EXPORT_FUNC (oss_unregister_device);
 EXPORT_SYMBOL (oss_unregister_interrupts);
-EXPORT_SYMBOL (oss_virt_to_bus);
+// EXPORT_SYMBOL (oss_virt_to_bus);
 EXPORT_FUNC (oss_pci_read_config_byte);
 EXPORT_FUNC (oss_pci_read_config_word);
 EXPORT_FUNC (oss_pci_read_config_dword);
