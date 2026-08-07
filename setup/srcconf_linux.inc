@@ -53,7 +53,9 @@ add_kernel_flags (FILE * f)
   fprintf (f,
 	     "CFLAGS += -O2 -fno-common -mcmodel=kernel -mno-red-zone -fno-tree-slp-vectorize -fno-pie -fno-asynchronous-unwind-tables -ffreestanding%s\n", fnsp);
 # else
-#   ifndef __arm__
+#   if defined(__arm__) || defined(__sh__) || defined(__mips__) || defined(__sparc__) || defined(__ia64__) || defined(__alpha__) || defined(__s390__) || defined(__powerpc__) || defined(__hppa__)
+  fprintf (f, "CFLAGS += -O2 -fno-common -ffreestanding%s\n", fnsp);
+#   else
   if (getenv ("NO_REGPARM") == NULL)
 	{
 	  fprintf (f,
@@ -63,8 +65,6 @@ add_kernel_flags (FILE * f)
 	{
 	  fprintf (f, "CFLAGS += -O2 -fno-common -ffreestanding -DNO_REGPARM%s\n", fnsp);
 	}
-#   else
-  fprintf (f, "CFLAGS += -O2 -fno-common -ffreestanding%s\n", fnsp);
 #   endif
 # endif
 }

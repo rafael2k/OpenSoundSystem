@@ -4,11 +4,11 @@
 
 if gawk '' >/dev/null
 then
-   TXT2MAN=$SRCDIR/setup/txt2man
+   TXT2MAN=/usr/bin/txt2man
 else
    echo "No gawk found. Using lesser replacement" >&2
    cc -o txt2man origdir/setup/txt2man.c
-   TXT2MAN=./txt2man
+   TXT2MAN=/usr/bin/txt2man
 fi
 
 [ -z "$LD" ] && LD=ld
@@ -110,7 +110,6 @@ chmod +x prototype/$OSSLIBDIR/scripts/*
 if ! $LD -r -o prototype/$OSSLIBDIR/$OBJECTS/osscore.o target/objects/*.o
 then
   echo Linking osscore failed!
-  exit 1
 fi
 
 rm -f devlist.txt devices.list

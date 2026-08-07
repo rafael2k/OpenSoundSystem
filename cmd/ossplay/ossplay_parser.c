@@ -764,7 +764,7 @@ play_voc (dspdev_t * dsp, const char * filename, int fd, unsigned char * hdr,
          pos = l + 7, tmp, vers;
   unsigned char buf[256], block_type;
   flag plock = 0;
-  int speed = 11025, channels = 1, bits = 8, format = AFMT_U8;
+  int speed = 11025, channels = 1, bits __attribute__((unused)) = 8, format = AFMT_U8;
   errors_t ret;
 
   if (read (fd, hdr + 19, 7) < 7)
@@ -1685,7 +1685,7 @@ static int
 caf_desc_parse (uint32 id, unsigned char * buf, big_t len, file_t * f)
 {
   int format;
-  uint32 bits, bytes_per_packet, flags, frames_per_packet;
+  uint32 bits, bytes_per_packet, flags, frames_per_packet __attribute__((unused));
 
   {
     /*

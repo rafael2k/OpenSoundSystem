@@ -26,6 +26,7 @@ osspci_probe (struct pci_dev *pcidev, const struct pci_device_id *pciid)
 {
   oss_device_t *osdev;
   dev_info_t *dip;
+  int err;
 
   if (n_devmap >= MAX_INSTANCE)
     {
@@ -55,7 +56,11 @@ osspci_probe (struct pci_dev *pcidev, const struct pci_device_id *pciid)
     }
   osdev_set_major (osdev, module_major);
 
-  pci_enable_device (pcidev);
+  err = pci_enable_device (pcidev);
+  if (err) {
+    dev_err(&pcidev->dev, "can't enable device.\n");
+    return err;
+  }
   if (!DRIVER_ATTACH (osdev))
     {
       pci_disable_device (pcidev);

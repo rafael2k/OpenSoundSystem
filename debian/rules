@@ -1,26 +1,116 @@
 #!/usr/bin/make -f
 
-DPKG_EXPORT_BUILDFLAGS=1
-include /usr/share/dpkg/architecture.mk
-include /usr/share/dpkg/buildflags.mk
+DEB_DH_INSTALLINIT_ARGS := --no-start -- start 50 S . stop 50 0 1 6 .
+DEB_DH_INSTALL_ARGS := -X.svn
+UPSTREAM_VERSION := $(shell dpkg-parsechangelog -S Version | cut  -d- -f1-2)
 
-%:
-	dh $@
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_MULTIARCH  ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-override_dh_auto_configure: build/build.id
-	:
+include /usr/share/cdbs/1/rules/debhelper.mk
 
-build/build.id:
-	mkdir -p build
-	cd build && $(CURDIR)/configure --enable-libsalsa=NO --config-vmix=FIXEDPOINT
+export DH_COMPAT=10
 
-override_dh_auto_build:
-	cd build/lib/libOSSlib && CFLAGS="$$CFLAGS -isystem $(CURDIR)/debian/include-alsa" make libOSSlib.so
-	cd build/lib/libsalsa && CFLAGS="$$CFLAGS -isystem $(CURDIR)/debian/include-alsa" make
+pre-build:: stamp-prepare-oss4
+
+stamp-prepare-oss4:
+	mkdir -p $(CURDIR)/build-tree/oss-build
+	cd $(CURDIR)/build-tree/oss-build && $(CURDIR)/configure --enable-libsalsa=NO --config-vmix=FIXEDPOINT
+
+ifneq ($(DEB_HOST_ARCH_OS),hurd)
+	# we do NOT want to build the kernel modules now
+	sed -i -e 's/SUBDIRS=lib cmd \(.*\)/SUBDIRS=lib cmd os_cmd/' $(CURDIR)/build-tree/oss-build/Makefile
+	echo > $(CURDIR)/build-tree/oss-build/.makefile
+endif
+
+	touch $@
+
+stamp-build-oss4:
+	cd $(CURDIR)/build-tree/oss-build && make build
+
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	# TODO: rewrite upstream's 'build.sh' from scratch
+	cat `find $(CURDIR)/build-tree/oss-build/kernel/drv -name .devices`| grep -v '^#' \
+	| sort | grep -v '^osscore' | grep -v '^oss_audiocs' | grep -v '^oss_sadasupport' \
+	> $(CURDIR)/build-tree/oss-build/prototype/usr/lib/oss/etc/devices.list
+
+	for n in `cat $(CURDIR)/build-tree/oss-build/prototype/usr/lib/oss/etc/devices.list | cut -f 1 | uniq` ; do \
+	    ( sed "s:CONFIGFILEPATH:/etc/oss4/conf:g" < $(CURDIR)/build-tree/oss-build/noregparm/kernel/drv/$$n/$$n.man > /tmp/ossman.txt && \
+	    /usr/bin/txt2man -t "$$n" -v "OSS Devices" -s 7 /tmp/ossman.txt | gzip -9 > $(CURDIR)/build-tree/oss-build/prototype/usr/share/man/man7/$$n.7.gz ) \
+	done
+endif
+
+	touch $@
+
+stamp-build-libsalsa:
+	cd $(CURDIR)/build-tree/oss-build/lib/libOSSlib && CFLAGS="$$CFLAGS -isystem $(CURDIR)/debian/include-alsa" make libOSSlib.so
+	cd $(CURDIR)/build-tree/oss-build/lib/libsalsa && CFLAGS="$$CFLAGS -isystem $(CURDIR)/debian/include-alsa" make
 	sed -e '/^libdir/s&$$&/$(DEB_HOST_MULTIARCH)&' < debian/alsa.pc.in > debian/alsa.pc
 
-override_dh_auto_install:
-	:
+	touch $@
 
-override_dh_auto_clean:
-	rm -rf debian/alsa.pc build
+build/oss4-base:: stamp-build-oss4
+
+build/oss4-source:: stamp-source-oss4
+	rm -rf build-tree/modules/oss4/debian
+	mkdir -p build-tree/modules/oss4/debian
+	cp -r debian/m-a/* build-tree/modules/oss4/debian/
+	cp debian/copyright build-tree/modules/oss4/debian/
+	cp debian/changelog build-tree/modules/oss4/debian/
+	chmod 755 build-tree/modules/oss4/debian/rules
+	cd build-tree/ &&  tar cjf oss4.tar.bz2 modules/
+
+build/oss4-dkms:: stamp-source-oss4
+	sed -e 's#_VERSION_#$(UPSTREAM_VERSION)#' < debian/oss4-dkms.install.in > debian/oss4-dkms.install
+	sed -e 's#_VERSION_#$(UPSTREAM_VERSION)#' < debian/oss4-dkms.dkms.in > debian/oss4-dkms.dkms
+
+build/liboss4-salsa2:: stamp-build-libsalsa
+build/liboss4-salsa-dev:: stamp-build-libsalsa
+build/liboss4-salsa-asound2:: stamp-build-libsalsa
+
+install/oss4-dkms::
+	dh_dkms
+
+stamp-source-oss4:
+	bash ./debian/create-ma-tree.sh build-tree/modules/oss4 build-tree/oss-build
+	find build-tree/modules/oss4 -type f -exec chmod -x {} \;
+	touch $@
+
+$(CURDIR)/debian/tmp: stamp-build-oss4
+	cp -a $(CURDIR)/build-tree/oss-build/prototype $(CURDIR)/debian/tmp
+
+install/oss4-base:: $(CURDIR)/debian/tmp
+	sed -e 's#_VERSION_#$(UPSTREAM_VERSION)#' < debian/oss.conf.in > debian/oss.conf
+
+binary-install/oss4-base::
+	chmod +x $(CURDIR)/debian/oss4-base/etc/pm/sleep.d/30oss4-pm
+	cat debian/modprobe.d/OSS-module-list \
+	        | sed -e 's/^[[:space:]]*//' -e 's/#.*//' -e '/^$$/d' \
+		    -e 's/[[:space:]].*//' -e 's/^/blacklist /' \
+	        > debian/oss4-base/etc/modprobe.d/oss4-base_noOSS3.conf
+	cat debian/modprobe.d/ALSA-module-list \
+	        | sed -e 's/^[[:space:]]*//' -e 's/#.*//' -e '/^$$/d' \
+		    -e 's/[[:space:]].*//' -e 's/^/blacklist /' \
+	        > debian/oss4-base/etc/modprobe.d/oss4-base_noALSA.conf
+
+binary-install/liboss4-salsa-dev::
+	dh_install -pliboss4-salsa-dev build-tree/oss-build/lib/libsalsa/.libs/liboss4-salsa.a build-tree/oss-build/lib/libsalsa/.libs/liboss4-salsa.so usr/lib/$(DEB_HOST_MULTIARCH)
+	dh_link -pliboss4-salsa-dev /usr/lib/$(DEB_HOST_MULTIARCH)/liboss4-salsa.so.2 /usr/lib/$(DEB_HOST_MULTIARCH)/libasound.so
+	dh_link -pliboss4-salsa-dev /usr/lib/$(DEB_HOST_MULTIARCH)/liboss4-salsa.so.2 /usr/lib/$(DEB_HOST_MULTIARCH)/libasound.a
+
+binary-install/liboss4-salsa2::
+	dh_install -pliboss4-salsa2 build-tree/oss-build/lib/libsalsa/.libs/liboss4-salsa.so.2* usr/lib/$(DEB_HOST_MULTIARCH)
+	dh_install -pliboss4-salsa2 build-tree/oss-build/lib/libOSSlib/libOSSlib.so usr/lib/$(DEB_HOST_MULTIARCH)/oss4-libsalsa
+
+binary-install/liboss4-salsa-asound2::
+	dh_link -pliboss4-salsa-asound2 /usr/lib/$(DEB_HOST_MULTIARCH)/liboss4-salsa.so.2 /usr/lib/$(DEB_HOST_MULTIARCH)/libasound.so.2
+
+install/oss4-dev:: $(CURDIR)/debian/tmp
+install/oss4-source:: $(CURDIR)/debian/tmp
+install/oss4-gtk:: $(CURDIR)/debian/tmp
+
+clean::
+	rm -rf stamp-build-oss4 stamp-prepare-oss4 stamp-source-oss4 debian/alsa.pc \
+	stamp-build-libsalsa build-tree \
+	debian/oss4-dkms.install debian/oss4-dkms.dkms debian/dkms/dkms.conf \
+	debian/oss.conf

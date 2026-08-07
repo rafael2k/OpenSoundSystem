@@ -1,49 +1,98 @@
 Source: oss4
 Section: sound
 Priority: optional
-Maintainer: Samuel Thibault <sthibault@debian.org>
-Uploaders: Sébastien Noel <sebastien@twolife.org>,
-           Romain Beauxis <toots@rastageeks.org>,
-           Benda Xu <heroxbd@gentoo.org>
-Build-Depends: dh-exec,
-               debhelper (>= 10~),
-               dpkg-dev (>= 1.22.5),
-               libtool-bin,
-Vcs-Browser: https://salsa.debian.org/debian/oss4
-Vcs-Git: https://salsa.debian.org/debian/oss4.git
+Maintainer: Rafael Diniz <rafael@riseup.net>
+Homepage: http://www.4front-tech.com/
+Testsuite: autopkgtest-pkg-dkms
+Rules-Requires-Root: no
 Standards-Version: 4.6.2
+Build-Depends: debhelper (>= 13), cdbs, dh-sequence-dkms, gawk, libgtk2.0-dev,
+ libtool-bin, patchutils, txt2man
+
+Package: oss4-base
+Architecture: linux-any
+Depends: ${misc:Depends}, ${shlibs:Depends}, sysvinit-utils (>= 3.05-4~)
+Breaks: linux-sound-base
+Replaces: linux-sound-base
+Recommends: pm-utils
+Suggests: oss4-modules
+Description: Open Sound System - base package
+ Open Sound System (OSS) is an attempt in unifying the digital audio
+ architecture for UNIX.
+ .
+ This package contains various utilities for configuring and using OSS
+ .
+ For OSS to work on a system with a given sound card, there must be an OSS
+ driver for that card in the kernel. For Linux, a custom oss4-modules
+ package can be built from the sources in the oss4-source package using the
+ module-assistant utility.
+
+Package: oss4-gtk
+Architecture: kfreebsd-any linux-any
+Depends: oss4-base [linux-any], ${misc:Depends}, ${shlibs:Depends}
+Description: Open Sound System - simple GTK2-based mixer control
+ Open Sound System (OSS) is an attempt in unifying the digital audio
+ architecture for UNIX.
+ .
+ This package contains a GTK2-based mixer control program.
+
+Package: oss4-dkms
+Section: kernel
+Architecture: linux-any
+Depends: dkms, oss4-base, ${misc:Depends}, libc6-dev
+Recommends: linux-headers-686-pae | linux-headers-amd64 | linux-headers-generic
+Provides: oss4-modules
+Description: Open Sound System - DKMS module sources
+ This package contains the source for the OSS4 kernel modules, packaged with
+ appropriate configuration for DKMS to build new modules dynamically.
+
+Package: oss4-source
+Architecture: linux-any
+Depends: debhelper, dpkg-dev, make, module-assistant, ${misc:Depends}
+Description: Open Sound System - drivers sources
+ This package provides the source code for the OSS4 kernel modules, in a
+ form suitable for use by module-assistant.
+
+Package: oss4-dev
+Architecture: all
+Section: devel
+Depends: ${misc:Depends}
+Description: Open Sound System - development files
+ This package provides the header for OSS 4.x development. You need this
+ file if you want to build programs which use the OSS 4.x API.
 
 Package: liboss4-salsa2
 Section: libs
 Architecture: any
-Multi-Arch: same
+Multi-arch: same
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: OSS to Alsa compatibility library
  Liboss4-salsa is a library providing an ALSA interface on top of OSS.
 
 Package: liboss4-salsa-dev
-Provides: libasound2-dev
-Conflicts: libasound2-dev
+Provides: libasound2-dev, liboss-salsa-dev
+Conflicts: libasound2-dev, liboss-salsa-dev
 Section: libdevel
 Architecture: hurd-any kfreebsd-any linux-any
-Depends: liboss4-salsa2 (= ${binary:Version}), ${misc:Depends}, liboss4-salsa-asound2 (= ${binary:Version})
+Depends: liboss4-salsa2 (= ${binary:Version}), ${misc:Depends}, liboss4-salsa-asound2
 Description: OSS to Alsa compatibility library -- development files
  Liboss4-salsa is a library providing an ALSA interface on top of OSS.
  .
  This package contains the development part of liboss4-salsa, which permit
- to build application using alsa on architectures which do not have libasound.
+ to build application using alsa on architectures which do not have
+ libasound.
 
 Package: liboss4-salsa-asound2
 Section: libs
 Architecture: any
-Provides: libasound2t64, libasound2 [amd64 arm64 mips64el ppc64el riscv64 s390x]
-Conflicts: libasound2t64, libasound2
-Multi-Arch: same
+Provides: libasound2
+Conflicts: libasound2
+Multi-arch: same
 Depends: liboss4-salsa2, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: OSS to Alsa compatibility library - binary compatibility symlink
  Liboss4-salsa is a library providing an ALSA interface on top of OSS.
  .
- This package contains a symbolic link that makes applications already compiled
- with ALSA use liboss4-salsa.
+ This package contains a symbolic link that makes applications already
+ compiled with ALSA use liboss4-salsa.

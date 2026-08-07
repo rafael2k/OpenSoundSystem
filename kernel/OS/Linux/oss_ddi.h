@@ -32,8 +32,6 @@ typedef int ddi_info_cmd_t;
 typedef int ddi_attach_cmd_t;
 typedef int ddi_detach_cmd_t;
 
-#include <stdint.h>
-
 typedef struct _ddi_dma_attr_t
 {
 #define DMA_ATTR_V0 0

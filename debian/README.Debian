@@ -1,0 +1,4 @@
+To compile oss4's modules, you should install the oss4-dkms package, which automate the 
+module build.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sun, 22 Aug 2010 23:01:02 -0500

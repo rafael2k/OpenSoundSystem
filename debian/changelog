@@ -1,3 +1,16 @@
+oss4 (4.2-build2020-9) unstable; urgency=medium
+
+  * Rebase Debian packaging on deb-multimedia (Christian Marillat) oss4-dmo:
+    restore oss4-base, oss4-gtk, oss4-dkms, oss4-source, oss4-dev packages
+    with kernel driver build (dkms) and modern-kernel patch set applied
+    in-tree (mregparm guard, linux/io, proc_ops, time_t, kernel includes,
+    module symbols for >= 6.2).
+  * oss4-dkms: enable oss_usb driver (USB audio, required for radio
+    sound card use); exclude lynxtwo from the dkms tree.
+  * liboss4-salsa-dev: enable on Linux (linux-any).
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 14:00:00 +0000
+
 oss4 (4.2-build2020-8) unstable; urgency=medium
 
   * liboss4-salsa-dev: Enable on Linux (linux-any). The package conflicts
@@ -13,10 +26,6 @@ oss4 (4.2-build2020-7) unstable; urgency=medium
     extramodules, soundon, rm-init-scripts, remove-hal).
 
  -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 12:00:00 +0000
-
-oss4 (4.2-build2020-6) unstable; urgency=medium
-
-  * rules: Take FLAGS from buildflags.mk.
   * patches/101_use_env_CFLAGS.patch: Fix taking CPPFLAGS and LDFLAGS into
     account.
   * Update standards version to 4.6.2, no changes needed.

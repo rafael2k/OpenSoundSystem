@@ -161,7 +161,7 @@ update_values (int mixernum)
   oss_mixext *ext;
   int i;
   int nrext;
-  int value, prev_value;
+  int value, prev_value __attribute__((unused));
 
   nrext = ossmix_get_nrext (mixernum);
 

@@ -21,7 +21,7 @@
 #endif
 
 #ifdef _KERNEL
-#include <inttypes.h>
+#include <linux/types.h>
 #endif
 
 #include "grc3.h"

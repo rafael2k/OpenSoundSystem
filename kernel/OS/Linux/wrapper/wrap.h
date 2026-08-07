@@ -1,3 +1,6 @@
+#ifndef _KERNEL_OS_LINUX_WRAPPER_WRAP_H_
+#define _KERNEL_OS_LINUX_WRAPPER_WRAP_H_
+
 /*
  * Purpose: Wrapper routines for Linux kernel services
  *
@@ -21,11 +24,7 @@
 /*
  * Some integer types
  */
-#if defined(__x86_64__)
 typedef unsigned long oss_native_word;	/* Same as the address and status register size */
-#else
-typedef unsigned long oss_native_word;	/* Same as the address and status register size */
-#endif
 typedef long long oss_int64_t;			/* Signed 64 bit integer */
 typedef unsigned long long oss_uint64_t;	/* Unsigned 64 bit integer */
 
@@ -129,8 +128,6 @@ extern void *oss_contig_malloc (oss_device_t * osdev, int sz,
 extern void oss_contig_free (oss_device_t * osdev, void *p, int sz);
 
 typedef unsigned long oss_time_t;
-
-extern oss_time_t oss_get_time (void);
 
 typedef struct _inode_handle_t oss_inode_handle_t;
 typedef struct _vm_aread_handle oss_vm_area_handle_t;
@@ -286,4 +283,4 @@ extern char *osdev_get_nick (oss_device_t * osdev);
 extern int osdev_get_instance (oss_device_t * osdev);
 extern int oss_request_major (oss_device_t * osdev, int major, char *module);
 extern int oss_register_device (oss_device_t * osdev, const char *name);	/* from oss_config.h */
-
+#endif

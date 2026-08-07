@@ -34,6 +34,9 @@ typedef int *ioctl_arg;
 #if LINUX_VERSION_CODE > KERNEL_VERSION(3,10,0)
 #include <linux/cred.h>
 #include <linux/uidgid.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+#include <linux/cred.h>
+#endif
 #endif
 #undef strlen
 #undef strcpy
@@ -82,6 +85,10 @@ static int nminors = 0;
 #define WK_SLEEP	0x08
 #define WK_SELECT	0x10
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+typedef old_time32_t time_t;
+#endif
+
 oss_time_t
 oss_get_time (void)
 {
@@ -118,7 +125,7 @@ oss_kmem_free (void *addr)
 extern oss_native_word
 oss_virt_to_bus (void *addr)
 {
-  return virt_to_bus (addr);
+  return virt_to_phys (addr);
 }
 
  */
@@ -133,14 +140,6 @@ oss_memcpy (void *t_, const void *f_, size_t l)
     *t++ = *f++;
 
   return t;
-}
-
-#ifdef memmove
-#undef memmove
-#endif
-void *memmove(void *dest, const void *src, size_t n)
-{
-	return oss_memcpy(dest, src, n);
 }
 
 void *
@@ -297,8 +296,7 @@ static struct file_operations oss_proc_operations = {
 #else
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0)
 static struct file_operations fops = { 
- .owner = THIS_MODULE,
- .read = oss_read_devfiles,
+ .proc_read = oss_read_devfiles,
 };
 #else
 static struct proc_ops fops = {
@@ -704,43 +702,24 @@ oss_create_uio (uio_t * uio, char *buf, size_t count, uio_rw_t rw,
 void
 oss_cmn_err (int level, const char *s, ...)
 {
-  char tmp[920], *a[6];
+  char tmp[920];
   va_list ap;
-  int i, n = 0;
 
   va_start (ap, s);
 
-  for (i = 0; i < strlen (s); i++)
-    if (s[i] == '%')
-      n++;
-
-  for (i = 0; i < n && i < 6; i++)
-    a[i] = va_arg (ap, char *);
-
-  for (i = n; i < 6; i++)
-    a[i] = NULL;
-
   if (level == CE_CONT)
     {
-      sprintf (tmp, s, a[0], a[1], a[2], a[3], a[4], a[5], NULL,
-	       NULL, NULL, NULL);
-      printk ("%s", tmp);
+      vprintk (s, ap);
     }
   else
     {
       strcpy (tmp, "osscore: ");
-      sprintf (tmp + strlen (tmp), s, a[0], a[1], a[2], a[3], a[4], a[5],
-	       NULL, NULL, NULL, NULL);
+      vsnprintf (tmp + strlen (tmp), sizeof(tmp) - strlen(tmp), s, ap);
       if (level == CE_PANIC)
 	panic (tmp);
 
       printk (KERN_ALERT "%s", tmp);
     }
-#if 0
-  /* This may cause a crash under SMP */
-  if (sound_started)
-    store_msg (tmp);
-#endif
 
   va_end (ap);
 }

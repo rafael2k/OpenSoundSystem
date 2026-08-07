@@ -51,15 +51,23 @@
 
 #define __invalid_size_argument_for_IOC 0	/* Dummy define to cure some broken ioctl.h versions */
 
+#if defined(__KERNEL__)
+#include <linux/types.h>
+#include <linux/param.h>
+#include <linux/file.h>
+#include <linux/stat.h>
+#include <linux/fcntl.h>
+#else
 #include <sys/types.h>
 #include <sys/param.h>
-#include <sys/signal.h>
-#include <oss_errno.h>
 #include <sys/file.h>
-#include "oss_ddi.h"
 #include <sys/stat.h>
 #include <sys/fcntl.h>
+#endif
+
 #include <asm/poll.h>
+#include <oss_errno.h>
+#include "oss_ddi.h"
 #include "kernel/OS/Linux/wrapper/wrap.h"
 
 #undef HZ
@@ -119,6 +127,7 @@ struct _oss_device_t
 /* System wall timer access */
 #define GET_JIFFIES()	oss_get_jiffies()
 
+#if defined(__i386__) || defined(__x86_64__)
 __attribute__ ((gnu_inline)) extern inline unsigned int
 __inb (unsigned short port)
 {
@@ -161,6 +170,7 @@ __outl (unsigned int value, unsigned short port)
   __asm__ __volatile__ ("out" "l" " %" "0,%" "w" "1"::"a" (value),
 			"d" (port));
 }
+#endif
 
 #define INB(osdev,a)	__inb(a)
 #define INW(osdev,a)	__inw(a)

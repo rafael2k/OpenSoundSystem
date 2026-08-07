@@ -81,7 +81,11 @@ valid_elf_file (Elf_Ehdr * hdr)
     }
   if (hdr->e_ehsize != sizeof (*hdr))
     {
-      fprintf (stderr, "e_ehsize=%x (%lx)\n", hdr->e_ehsize, sizeof (*hdr));
+      #if defined(__alpha__) || defined(__s390__) || defined(__ia64__)
+        fprintf (stderr, "e_ehsize=%x (%lx)\n", hdr->e_ehsize, sizeof (*hdr));
+      #else
+        fprintf (stderr, "e_ehsize=%x (%x)\n", hdr->e_ehsize, sizeof (*hdr));
+      #endif
       return 0;
     }
 

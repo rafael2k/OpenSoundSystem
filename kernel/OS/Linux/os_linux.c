@@ -13,6 +13,9 @@
  *
  */
 
+#include <linux/version.h>
+#include <linux/time.h>
+
 #include <oss_config.h>
 #include <midi_core.h>
 
@@ -990,6 +993,11 @@ oss_install_chrdev (oss_device_t * osdev, char *name, int dev_class,
       oss_register_minor (osdev->major, num, name);
     }
 }
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+typedef old_time32_t time_t;
+#endif
+extern time_t oss_get_time (void);
 
 int
 oss_init_osscore (oss_device_t * osdev)

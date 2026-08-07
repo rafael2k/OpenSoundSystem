@@ -1,0 +1,220 @@
+#!/bin/bash
+#
+# Starts the OSS sound driver
+#
+### BEGIN INIT INFO
+# Provides:          oss4-base
+# Required-Start:    $remote_fs $local_fs
+# Required-Stop:     $remote_fs $local_fs
+# Default-Start:     S
+# Default-Stop:      0 1 6
+# Short-Description: Start and Stop the OSS4 subsystem
+### END INIT INFO
+
+OSSETCDIR=/etc/oss4
+OSSVARDIR=/var/lib/oss4
+
+. /etc/oss.conf
+. /lib/lsb/init-functions
+
+# Exit if oss4 is not installed
+test -x /usr/sbin/ossdetect || exit 0
+
+echo_procs_using_sound()
+{
+	echo $( fuser /dev/mixer* /dev/dsp* /dev/midi* /dev/oss/*/* 2>/dev/null )
+}
+
+kill_procs_using_sound()
+{
+	procs_using_sound="$(echo_procs_using_sound)"
+
+	if [ "$procs_using_sound" ] ; then
+		echo -n "Terminating processes:"
+		for attempt in 1 2 3 4 ; do
+			echo -n " ${procs_using_sound}"
+			kill $procs_using_sound || :
+			sleep 1
+			procs_using_sound="$(echo_procs_using_sound)"
+			[ "$procs_using_sound" ] || break
+		done
+		# Either no more procs using sound or attempts ran out
+		if [ "$procs_using_sound" ] ; then
+			echo -n " (with SIGKILL:) ${procs_using_sound}"
+			kill -9 $procs_using_sound || :
+			sleep 1
+		fi
+		procs_using_sound="$(echo_procs_using_sound)"
+		if [ "$procs_using_sound" ] ; then
+			echo " (failed: processes still using sound devices: $(echo_with_command_names $procs_using_sound))."
+			return 1
+		fi
+		echo "."
+	fi
+	return 0
+}
+
+unload_modules()
+{
+	procs_using_sound="$(echo_procs_using_sound)"
+
+	if test "$procs_using_sound " != " "
+	then
+	  log_action_end_msg 2 'Some applications are still using OSS'
+	  exit 2
+	fi
+
+	# Unload oss drivers
+	for n in `cat $OSSETCDIR/installed_drivers | sed 's/#.*//'`
+	do
+		if ! /sbin/rmmod $n
+		then
+			log_warning_msg "Unloading module $n failed - ignored"
+		fi
+	done
+
+	if ! /sbin/rmmod osscore
+	then
+		log_action_end_msg 3 'Cannot unload the OSS driver modules'
+		exit 3
+	fi
+}
+
+case "$1" in
+  start)
+	log_begin_msg 'Starting Open Sound System: '
+
+	# Check if OSS is already running
+	if test -f /proc/opensound/devfiles
+	then
+		log_action_end_msg 0 'OSS is already loaded'
+		exit 0
+	fi
+
+	# Check if oss kernel modules are installed
+	if ! test -f /lib/modules/`uname -r`/kernel/oss4/osscore.ko && ! test -f /lib/modules/`uname -r`/updates/dkms/osscore.ko
+	then
+		log_action_end_msg 1 'No kernel modules detected'
+		exit 0
+	fi
+
+	# Detect hardware
+	if ! test -f $OSSETCDIR/installed_drivers
+	then
+		/usr/sbin/ossdetect -v
+	fi
+	if ! test -f $OSSETCDIR/installed_drivers
+	then
+		log_action_end_msg 10 "No $OSSETCDIR/installed_drivers - cannot continue (problem with ossdetect?)"
+		exit 10
+	fi
+
+	# Load osscore
+	OPTIONS=
+	if test -f $OSSETCDIR/conf/osscore.conf
+	then
+	  OPTIONS="`grep -v -h '^#' $OSSETCDIR/conf/osscore.conf|sed 's/ //g'`"
+	fi
+	if ! /sbin/modprobe osscore $OPTIONS
+	then
+		log_action_end_msg 60 "Cannot load the osscore module"
+		exit 60
+	fi
+
+	# Load oss drivers
+	for n in `cat $OSSETCDIR/installed_drivers | sed 's/#.*//'`
+	do
+		OPTIONS=
+
+		if test -f $OSSETCDIR/conf/$n.conf
+		then
+		  OPTIONS="`grep -v -h '^#' $OSSETCDIR/conf/$n.conf|sed 's/ //g'`"
+		fi
+
+		if ! /sbin/modprobe $n $OPTIONS
+		then
+			log_warning_msg "Loading module $n failed - ignored"
+		fi
+	done
+
+	# Check if everything is OK
+	if ! test -f /proc/opensound/devfiles
+	then
+		log_action_end_msg 70 'OSS Core module refused to start'
+		exit 70
+	fi
+
+	# Create device file
+	/usr/sbin/ossdetect -d -m 660 -g audio
+
+	# Create basic links
+	/usr/sbin/ossdevlinks
+	if test -f $OSSVARDIR/legacy_devices
+	then
+		sh $OSSVARDIR/legacy_devices
+	fi
+
+	/usr/sbin/savemixer -L
+
+	log_action_end_msg 0
+	;;
+
+  stop)
+	log_begin_msg 'Stopping Open Sound System: '
+	if ! test -f /proc/opensound/devfiles
+	then
+		log_action_end_msg 0 'OSS not loaded'
+		exit 0
+	fi
+
+	/usr/sbin/savemixer
+
+	log_action_end_msg 0
+	;;
+
+  unload)
+	log_begin_msg 'Unloading Open Sound System kernel modules: '
+
+	if ! test -f /proc/opensound/devfiles
+	then
+		log_action_end_msg 0 'OSS not loaded'
+		exit 0
+	fi
+
+	/usr/sbin/savemixer
+	unload_modules
+	log_action_end_msg 0
+	;;
+
+  force-unload)
+	log_begin_msg 'Unloading Open Sound System kernel modules: '
+
+	if ! test -f /proc/opensound/devfiles
+	then
+		log_action_end_msg 0 'OSS not loaded'
+		exit 0
+	fi
+
+	/usr/sbin/savemixer
+	kill_procs_using_sound
+	unload_modules
+	log_action_end_msg 0
+	;;
+
+  restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+
+  force-reload)
+	$0 force-unload
+	sleep 1
+	$0 start
+	;;
+
+  *)
+	echo "Usage: $0 {start|stop|unload|force-unload|restart|force-reload}"
+	exit 3
+esac
+

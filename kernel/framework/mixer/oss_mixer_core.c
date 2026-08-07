@@ -18,7 +18,7 @@
 
 #include <oss_config.h>
 #include <midi_core.h>
-#include <stdarg.h>
+#include <linux/stdarg.h>
 oss_mutex_t oss_timing_mutex;
 
 char *oss_license_string = OSS_LICENSE;

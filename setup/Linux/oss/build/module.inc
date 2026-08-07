@@ -14,6 +14,7 @@
  */
 #define strcpy dummy_strcpy
 #include <linux/version.h>
+#include <linux/utsname.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/errno.h>
@@ -242,4 +243,6 @@ oss_cmn_err (int level, const char *s, ...)
   va_end (ap);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,2,0)
 #include "osscore_symbols.inc"
+#endif

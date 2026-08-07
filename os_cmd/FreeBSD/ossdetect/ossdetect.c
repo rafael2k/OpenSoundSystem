@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <sys/sysmacros.h>
 #include <sys/pciio.h>
 #include <dev/pci/pcireg.h>
 

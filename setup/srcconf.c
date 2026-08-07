@@ -1226,7 +1226,7 @@ printf("Symlink %s -> %s\n", source, target);
 		     obj_src[i], objdir, objects[i]);
 	  else
 	    fprintf (f,
-		     "\t$(CC) -c $(CFLAGS) $(OSFLAGS) $(LIBRARIES) $(INCLUDES) %s -o $(%s)/%s\n",
+		     "\t$(CC) -c $(CFLAGS) $(OSFLAGS) $(INCLUDES) %s -o $(%s)/%s $(LIBRARIES)\n",
 		     obj_src[i], objdir, objects[i]);
 	  fprintf (f, "\n");
 	}

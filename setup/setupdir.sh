@@ -36,10 +36,12 @@ fi
 # Use Linux24 as the OS name for Linux 2.4.x
 if test "$OS " = "Linux "
 then
-  if test "`uname -r | cut -d '.' -f 1-2` " = "2.4 "
-  then
-	OS=Linux24
-  fi
+  case "`uname -r`" in
+    2.4*)
+      OS=Linux24;;
+    *)
+      ;;
+  esac
 fi
 
 # pkg-config seems to crash in some systems so disable core dumps
@@ -192,7 +194,7 @@ mkdir target/tmpobjects
 
 touch .depend
 
-if date -u +%Y%m%d%H%M > build.id.new 2>/dev/null
+if date -u +%Y%m%d%H%M -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" > build.id.new 2>/dev/null
 then
 	rm -f build.id
 	mv build.id.new build.id
