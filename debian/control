@@ -26,7 +26,7 @@ Package: liboss4-salsa-dev
 Provides: libasound2-dev
 Conflicts: libasound2-dev
 Section: libdevel
-Architecture: hurd-any kfreebsd-any
+Architecture: hurd-any kfreebsd-any linux-any
 Depends: liboss4-salsa2 (= ${binary:Version}), ${misc:Depends}, liboss4-salsa-asound2 (= ${binary:Version})
 Description: OSS to Alsa compatibility library -- development files
  Liboss4-salsa is a library providing an ALSA interface on top of OSS.

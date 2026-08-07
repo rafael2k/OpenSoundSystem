@@ -1,3 +1,10 @@
+oss4 (4.2-build2020-8) unstable; urgency=medium
+
+  * liboss4-salsa-dev: Enable on Linux (linux-any). The package conflicts
+    with libasound2-dev by design; install only on OSS-exclusive systems.
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 13:00:00 +0000
+
 oss4 (4.2-build2020-7) unstable; urgency=medium
 
   * Fork update: apply Debian libsalsa patch set directly in-tree and
