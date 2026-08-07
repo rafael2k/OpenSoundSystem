@@ -126,6 +126,10 @@ extern void *oss_contig_malloc (oss_device_t * osdev, int sz,
 				oss_uint64_t memlimit,
 				oss_native_word * phaddr);
 extern void oss_contig_free (oss_device_t * osdev, void *p, int sz);
+extern void *oss_dma_alloc (oss_device_t * osdev, int sz,
+			    oss_uint64_t memlimit, oss_native_word * phaddr);
+extern void oss_dma_free (oss_device_t * osdev, void *p, int sz);
+extern int oss_dma_capable (oss_device_t * osdev);
 
 typedef unsigned long oss_time_t;
 

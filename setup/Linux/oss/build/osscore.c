@@ -28,6 +28,7 @@ typedef int *ioctl_arg;
 #include <linux/proc_fs.h>
 #include <linux/spinlock.h>
 #include <linux/pci.h>
+#include <linux/dma-mapping.h>
 #include <linux/irq.h>
 #include <linux/sched.h>
 #include <linux/interrupt.h>
@@ -843,6 +844,17 @@ oss_unreserve_pages (oss_native_word start_addr, oss_native_word end_addr)
     clear_bit (PG_reserved, &page->flags);
 }
 
+/*
+ * DMA buffers: when an IOMMU is active (e.g. intel-iommu) the device must
+ * use the bus address returned by dma_alloc_coherent() instead of the plain
+ * physical address, otherwise the controller gets DMA faults. The actual
+ * allocation is done in os_linux.c which knows the device structure.
+ */
+extern void *oss_dma_alloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
+			    oss_native_word * phaddr);
+extern void oss_dma_free (oss_device_t * osdev, void *p, int buffsize);
+extern int oss_dma_capable (oss_device_t * osdev);
+
 void *
 oss_contig_malloc (oss_device_t * osdev, int buffsize, oss_uint64_t memlimit,
 		   oss_native_word * phaddr)
@@ -852,6 +864,9 @@ oss_contig_malloc (oss_device_t * osdev, int buffsize, oss_uint64_t memlimit,
   int flags = 0;
 
   *phaddr = 0;
+
+  if (oss_dma_capable (osdev))
+    return oss_dma_alloc (osdev, buffsize, memlimit, phaddr);
 
 #ifdef GFP_DMA32
   if (memlimit < 0x0000000100000000LL)
@@ -903,6 +918,12 @@ oss_contig_free (oss_device_t * osdev, void *p, int buffsize)
 
   if (p == NULL)
     return;
+
+  if (oss_dma_capable (osdev))
+    {
+      oss_dma_free (osdev, p, buffsize);
+      return;
+    }
 
   for (sz = 0, size = PAGE_SIZE; size < buffsize; sz++, size <<= 1);
 
@@ -1577,6 +1598,7 @@ oss_create_pcidip (struct pci_dev * pcidev)
 
   memset (dip, 0, sizeof (*dip));
   dip->pcidev = pcidev;
+  dip->dev = &pcidev->dev;
 
   return dip;
 }

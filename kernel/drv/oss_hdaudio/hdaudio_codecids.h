@@ -827,6 +827,48 @@ static const char *conexant_modem_remap[] =
 	NULL
 };
 
+static const char *alc298remap[] = {
+  EMPTY_STR,				/* 0x00 */
+  EMPTY_STR,				/* 0x01 */
+  "front",				/* 0x02 */
+  "rear",				/* 0x03 */
+  EMPTY_STR,				/* 0x04 */
+  EMPTY_STR,				/* 0x05 */
+  "spdif-out",				/* 0x06 */
+  EMPTY_STR,				/* 0x07 */
+  "rec1",				/* 0x08 */
+  "rec2",				/* 0x09 */
+  "rec3",				/* 0x0a */
+  "mix",				/* 0x0b */
+  "front",				/* 0x0c */
+  "rear",				/* 0x0d */
+  EMPTY_STR,				/* 0x0e */
+  EMPTY_STR,				/* 0x0f */
+  EMPTY_STR,				/* 0x10 */
+  EMPTY_STR,				/* 0x11 */
+  "int-mic",				/* 0x12 */
+  EMPTY_STR,				/* 0x13 */
+  "speaker",				/* 0x14 */
+  EMPTY_STR,				/* 0x15 */
+  EMPTY_STR,				/* 0x16 */
+  "headphone",				/* 0x17 */
+  "mic",				/* 0x18 */
+  "dock-mic",				/* 0x19 */
+  EMPTY_STR,				/* 0x1a */
+  EMPTY_STR,				/* 0x1b */
+  EMPTY_STR,				/* 0x1c */
+  EMPTY_STR,				/* 0x1d */
+  "spdif-out",				/* 0x1e */
+  EMPTY_STR,				/* 0x1f */
+  EMPTY_STR,				/* 0x20 */
+  "headphone2",				/* 0x21 */
+  "rec1-sel",				/* 0x22 */
+  "rec2-sel",				/* 0x23 */
+  "rec3-sel",				/* 0x24 */
+  "rec4-sel",				/* 0x25 */
+  NULL
+};
+
 extern int hdaudio_GPIO_init_1 (int dev, hdaudio_mixer_t * mixer, int cad, int top_group);
 
 static const codec_desc_t codecs[] = {
@@ -847,6 +889,7 @@ static const codec_desc_t codecs[] = {
   {0x10ec0889, "ALC889", VF_ALC88X_HACK, (char **) &alc883remap}, 
   {0x10ec0892, "ALC892", VF_ALC88X_HACK, (char **) &alc883remap}, 
   {0x10ec0899, "ALC899", VF_ALC88X_HACK, (char **) &alc883remap},
+  {0x10ec0298, "ALC298", VF_NONE, (char **) &alc298remap},
 
   /* CMedia HDA codecs */
   {0x13f69880, "CMI9880", VF_NONE, (char **) &cmi9880remap},

@@ -20,6 +20,23 @@
 #include <midi_core.h>
 
 /*
+ * Declared manually instead of including <linux/dma-mapping.h> or
+ * <linux/pci.h> which pull in asm/io.h (and its __inb/__outb definitions)
+ * on x86.
+ */
+struct device;
+extern void *dma_alloc_attrs (struct device *dev, size_t size,
+			      dma_addr_t * dma_handle, gfp_t flag,
+			      unsigned long attrs);
+extern void dma_free_attrs (struct device *dev, size_t size,
+			    void *cpu_addr, dma_addr_t dma_handle,
+			    unsigned long attrs);
+
+#ifdef __KERNEL__
+#include "ossdip.h"
+#endif
+
+/*
  * OSS has traditionally used fixed character device number (14). However
  * current OSS uses fully dynamic major number allocation. The legacy
  * character device 14 is left for ALSA.
@@ -41,6 +58,122 @@ void
 oss_pci_byteswap (oss_device_t * osdev, int mode)
 {
   // NOP
+}
+
+/*
+ * Mapping table for DMA buffers allocated with dma_alloc_coherent().
+ * Used to recover the bus address when freeing the buffer.
+ */
+#define OSS_DMA_MAP_MAX 32
+
+struct oss_dma_map_entry
+{
+  void *va;
+  dma_addr_t dma;
+  int size;
+};
+
+static struct oss_dma_map_entry oss_dma_map[OSS_DMA_MAP_MAX];
+
+static int
+oss_dma_map_add (void *va, dma_addr_t dma, int size)
+{
+  int i;
+
+  for (i = 0; i < OSS_DMA_MAP_MAX; i++)
+    if (oss_dma_map[i].va == NULL)
+      {
+	oss_dma_map[i].va = va;
+	oss_dma_map[i].dma = dma;
+	oss_dma_map[i].size = size;
+	return 0;
+      }
+
+  cmn_err (CE_NOTE, "oss_dma_map: too many DMA buffers\n");
+  return -1;
+}
+
+static int
+oss_dma_map_del (void *va, dma_addr_t * dma)
+{
+  int i;
+
+  for (i = 0; i < OSS_DMA_MAP_MAX; i++)
+    if (oss_dma_map[i].va == va)
+      {
+	*dma = oss_dma_map[i].dma;
+	oss_dma_map[i].va = NULL;
+	return 0;
+      }
+
+  return -1;
+}
+
+int
+oss_dma_capable (oss_device_t * osdev)
+{
+  if (osdev->dip != NULL && osdev->dip->pcidev != NULL)
+    return 1;
+  return 0;
+}
+
+/*
+ * When an IOMMU is active (e.g. intel-iommu) the device must use the bus
+ * address returned by dma_alloc_coherent() instead of the plain physical
+ * address, otherwise the controller gets DMA faults.
+ */
+void *
+oss_dma_alloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
+	       oss_native_word * phaddr)
+{
+  struct device *dev = osdev->dip->dev;
+  dma_addr_t dma_handle;
+  void *buf;
+  int flags = 0;
+
+  *phaddr = 0;
+
+#ifdef GFP_DMA32
+  if (memlimit < 0x0000000100000000LL)
+    flags |= GFP_DMA32;
+#endif
+
+  if (memlimit < 0x00000000ffffffffLL)
+    flags |= GFP_DMA;
+
+  if (size < PAGE_SIZE)
+    size = PAGE_SIZE;
+
+  buf = dma_alloc_attrs (dev, size, &dma_handle, GFP_KERNEL | flags, 0);
+  if (buf == NULL)
+    {
+      cmn_err (CE_NOTE, "Failed to allocate DMA buffer of %d bytes\n", size);
+      return NULL;
+    }
+
+  if (oss_dma_map_add (buf, dma_handle, size) < 0)
+    {
+      dma_free_attrs (dev, size, buf, dma_handle, 0);
+      return NULL;
+    }
+
+  *phaddr = dma_handle;
+  return buf;
+}
+
+void
+oss_dma_free (oss_device_t * osdev, void *p, int size)
+{
+  struct device *dev = osdev->dip->dev;
+  dma_addr_t dma_handle;
+
+  if (oss_dma_map_del (p, &dma_handle) < 0)
+    return;
+
+  if (size < PAGE_SIZE)
+    size = PAGE_SIZE;
+
+  dma_free_attrs (dev, size, p, dma_handle, 0);
 }
 
 int

@@ -38,6 +38,37 @@
 #define INTEL_DEVICE_PPT        0x1e20
 #define INTEL_DEVICE_SCH        0x811b
 #define INTEL_DEVICE_PCH_C      0x8c20
+#define INTEL_DEVICE_HSW        0x0a0c
+#define INTEL_DEVICE_BDW        0x160c
+#define INTEL_DEVICE_BYT        0x0f04
+#define INTEL_DEVICE_BSW        0x2284
+#define INTEL_DEVICE_SKL_LP     0x9d70
+#define INTEL_DEVICE_SPT_LP     0x9d71
+#define INTEL_DEVICE_CNL_LP     0x9dc8
+#define INTEL_DEVICE_WPT_LP     0x9ca0
+#define INTEL_DEVICE_LPT_LP_0   0x9c20
+#define INTEL_DEVICE_LPT_LP_1   0x9c21
+#define INTEL_DEVICE_9_SERIES   0x8ca0
+#define INTEL_DEVICE_SKL        0xa170
+#define INTEL_DEVICE_KBL        0xa171
+#define INTEL_DEVICE_KBL_H      0xa2f0
+#define INTEL_DEVICE_CNL_H      0xa348
+#define INTEL_DEVICE_CML_S      0xa3f0
+#define INTEL_DEVICE_CML_LP     0x02c8
+#define INTEL_DEVICE_CML_H      0x06c8
+#define INTEL_DEVICE_ICL_LP     0x34c8
+#define INTEL_DEVICE_ICL_N      0x38c8
+#define INTEL_DEVICE_ICL_H      0x3dc8
+#define INTEL_DEVICE_TGL_LP     0xa0c8
+#define INTEL_DEVICE_TGL_H      0x43c8
+#define INTEL_DEVICE_ADL_P      0x51c8
+#define INTEL_DEVICE_ADL_PX     0x51cd
+#define INTEL_DEVICE_ADL_M      0x51cc
+#define INTEL_DEVICE_ADL_N      0x54c8
+#define INTEL_DEVICE_ADL_S      0x7ad0
+#define INTEL_DEVICE_RPL_S      0x7a50
+#define INTEL_DEVICE_APL        0x5a98
+#define INTEL_DEVICE_GML        0x3198
 
 #define NVIDIA_VENDOR_ID        0x10de
 #define NVIDIA_DEVICE_MCP51     0x026c
@@ -1822,6 +1853,37 @@ oss_hdaudio_attach (oss_device_t * osdev)
     case INTEL_DEVICE_PCH:
     case INTEL_DEVICE_PCH_B:
     case INTEL_DEVICE_PCH_C:
+    case INTEL_DEVICE_HSW:
+    case INTEL_DEVICE_BDW:
+    case INTEL_DEVICE_BYT:
+    case INTEL_DEVICE_BSW:
+    case INTEL_DEVICE_SKL_LP:
+    case INTEL_DEVICE_SPT_LP:
+    case INTEL_DEVICE_CNL_LP:
+    case INTEL_DEVICE_WPT_LP:
+    case INTEL_DEVICE_LPT_LP_0:
+    case INTEL_DEVICE_LPT_LP_1:
+    case INTEL_DEVICE_9_SERIES:
+    case INTEL_DEVICE_SKL:
+    case INTEL_DEVICE_KBL:
+    case INTEL_DEVICE_KBL_H:
+    case INTEL_DEVICE_CNL_H:
+    case INTEL_DEVICE_CML_S:
+    case INTEL_DEVICE_CML_LP:
+    case INTEL_DEVICE_CML_H:
+    case INTEL_DEVICE_ICL_LP:
+    case INTEL_DEVICE_ICL_N:
+    case INTEL_DEVICE_ICL_H:
+    case INTEL_DEVICE_TGL_LP:
+    case INTEL_DEVICE_TGL_H:
+    case INTEL_DEVICE_ADL_P:
+    case INTEL_DEVICE_ADL_PX:
+    case INTEL_DEVICE_ADL_M:
+    case INTEL_DEVICE_ADL_N:
+    case INTEL_DEVICE_ADL_S:
+    case INTEL_DEVICE_RPL_S:
+    case INTEL_DEVICE_APL:
+    case INTEL_DEVICE_GML:
       devc->chip_name = "Intel HD Audio";
       break;
 
@@ -1920,6 +1982,48 @@ oss_hdaudio_attach (oss_device_t * osdev)
      }
 
   err = init_HDA (devc);
+  if (err == 0)
+    {
+      int j;
+
+      cmn_err (CE_NOTE, "oss_hdaudio: init_HDA failed, cleaning up\n");
+
+      oss_unregister_interrupts (devc->osdev);
+
+      if (devc->corb != NULL)
+	CONTIG_FREE (devc->osdev, devc->corb, 4096, devc->corb_dma_handle);
+      devc->corb = NULL;
+
+      for (j = 0; j < devc->num_outengines; j++)
+	{
+	  hda_engine_t *engine = &devc->outengines[j];
+
+	  if (engine->bdl == NULL)
+	    continue;
+	  CONTIG_FREE (devc->osdev, engine->bdl, 4096,
+		       engine->bdl_dma_handle);
+	}
+
+      for (j = 0; j < devc->num_inengines; j++)
+	{
+	  hda_engine_t *engine = &devc->inengines[j];
+
+	  if (engine->bdl == NULL)
+	    continue;
+	  CONTIG_FREE (devc->osdev, engine->bdl, 4096,
+		       engine->bdl_dma_handle);
+	}
+
+      if (devc->membar_addr != 0)
+	{
+	  UNMAP_PCI_MEM (devc->osdev, 0, devc->membar_addr, devc->azbar,
+			 16 * 1024);
+	  devc->membar_addr = 0;
+	}
+
+      oss_unregister_device (devc->osdev);
+      already_attached = 0;
+    }
   return err;
 }
 

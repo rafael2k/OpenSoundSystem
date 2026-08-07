@@ -63,6 +63,7 @@ osspci_probe (struct pci_dev *pcidev, const struct pci_device_id *pciid)
   }
   if (!DRIVER_ATTACH (osdev))
     {
+      osdev_delete (osdev);
       pci_disable_device (pcidev);
       return -EIO;
     }

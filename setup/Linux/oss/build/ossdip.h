@@ -6,5 +6,6 @@
 struct _dev_info_t
 {
   struct pci_dev *pcidev;
+  struct device *dev;
 };
 #endif
