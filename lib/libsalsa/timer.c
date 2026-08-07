@@ -57,7 +57,7 @@ snd_timer_open (snd_timer_t ** tmr, const char *name, int mode)
 
   timer = malloc (sizeof (*timer));
 
-  dbg_printf ("snd_timer_open(name='%s', mode=%x)=%x\n", name, mode, timer);
+  dbg_printf ("snd_timer_open(name='%s', mode=%x)=%p\n", name, mode, timer);
 
   if (timer == NULL)
     return -ENOMEM;

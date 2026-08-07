@@ -1,0 +1,5 @@
+#!/usr/bin/dh-exec
+debian/alsa.pc usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
+debian/include-alsa/alsa usr/include
+build/lib/libsalsa/.libs/liboss4-salsa.a usr/lib/${DEB_HOST_MULTIARCH}/
+build/lib/libsalsa/.libs/liboss4-salsa.so usr/lib/${DEB_HOST_MULTIARCH}/

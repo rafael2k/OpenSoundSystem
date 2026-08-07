@@ -1,0 +1,3 @@
+# Run the "uscan" command to check for upstream updates and more.
+version=3
+http://www.4front-tech.com/developer/sources/stable/gpl/oss-v(.+)-src-gpl\.tar\.bz2

@@ -1,0 +1,3 @@
+#!/usr/bin/dh-exec
+build/lib/libsalsa/.libs/liboss4-salsa.so.2* usr/lib/${DEB_HOST_MULTIARCH}
+build/lib/libOSSlib/libOSSlib.so usr/lib/${DEB_HOST_MULTIARCH}/oss4-libsalsa

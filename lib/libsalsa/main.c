@@ -165,7 +165,7 @@ alib_appcheck (void)
 	      {
 		exit (system (banned_programs[i].action));
 	      }
-	    while (wait () != -1);
+	    while (wait (NULL) != -1);
 	    exit (1);
 	  }
 	return 0;
