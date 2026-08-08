@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/SunOS/oss/scripts/install.sh

@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_hdaudio/hdaudio_si3055.c

@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/debian/include-alsa/alsa/seq_midi_event.h

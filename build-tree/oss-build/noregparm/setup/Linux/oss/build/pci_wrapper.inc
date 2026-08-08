@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/Linux/oss/build/pci_wrapper.inc

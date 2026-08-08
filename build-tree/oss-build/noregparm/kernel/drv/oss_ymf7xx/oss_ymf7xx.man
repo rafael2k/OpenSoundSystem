@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_ymf7xx/oss_ymf7xx.man

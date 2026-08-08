@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/Linux/oss/scripts/restore_drv.sh

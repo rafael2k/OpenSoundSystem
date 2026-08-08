@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e 
+
+
+case "$1" in
+
+    remove|purge|disappear)
+      dpkg-divert --package oss4-dev --rename --remove "/usr/include/linux/soundcard.h"
+    ;;
+
+    *)
+        exit 0
+    ;;
+esac
+
+
+
+exit 0

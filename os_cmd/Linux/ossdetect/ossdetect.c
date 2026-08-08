@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
+#include <grp.h>
 #include <sys/dir.h>
 
 #define PCI_PASS	0
@@ -32,6 +33,7 @@
 
 #define OSSLIBDIRLEN 512
 static char *osslibdir = NULL;
+static char groupname[64] = "root";
 
 static int usb_ok = 0;
 
@@ -555,6 +557,13 @@ create_devlinks (mode_t node_m)
 	printf ("mknod %s c %d %d -m %o\n", dev, major, minor, node_m);
       if (mknod (dev, node_m, makedev (major, minor)) == -1)
 	perror (dev);
+      if (groupname[0] != 0)
+	{
+	  struct group *gr = getgrnam (groupname);
+
+	  if (gr != NULL)
+	    chown (dev, -1, gr->gr_gid);
+	}
     }
 
   umask (perm);
@@ -587,11 +596,15 @@ main (int argc, char *argv[])
   struct stat st;
   FILE *f;
 
-  while ((i = getopt(argc, argv, "L:a:dilm:uv")) != EOF)
+  while ((i = getopt(argc, argv, "L:a:dilm:uvg:")) != EOF)
     switch (i)
       {
 	case 'v':
 	  verbose++;
+	  break;
+
+	case 'g':
+	  strncpy (groupname, optarg, sizeof (groupname) - 1);
 	  break;
 
 	case 'd':

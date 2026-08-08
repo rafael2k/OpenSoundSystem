@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/lynxtwo/Hal4114.cpp

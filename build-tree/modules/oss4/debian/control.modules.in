@@ -1,0 +1,21 @@
+Source: oss4-dmo
+Section: sound
+Priority: optional
+Maintainer: Debian OSS4 Maintainers <pkg-oss4-maintainers@lists.alioth.debian.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.5.0
+
+Package: oss4-modules-_KVERS_
+Architecture: linux-any
+Provides: oss4-modules
+Description: OSS4 modules for Linux (kernel _KVERS_).
+ This package contains the set of loadable kernel modules for the
+ Open Sound System v4.
+ .
+ This package contains the compiled kernel modules for _KVERS_
+ .
+ If you have compiled your own kernel, you will most likely need to build
+ your own oss4-modules. The oss4-source package has been provided for use
+ with the Debian's module-assistant or kernel-package utilities
+ to produce a version of oss4-module for your kernel.
+

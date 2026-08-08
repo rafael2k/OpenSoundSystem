@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/SCO_SV/build.sh

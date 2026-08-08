@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/misc/samples/ddksample/ddksample.h

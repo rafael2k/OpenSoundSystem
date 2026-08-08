@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/OS/SCO_SV/module.inc

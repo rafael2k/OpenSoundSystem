@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_emu10k1x/oss_emu10k1x.c

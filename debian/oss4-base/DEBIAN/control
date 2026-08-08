@@ -1,0 +1,24 @@
+Package: oss4-base
+Source: oss4
+Version: 4.2-build2020-10
+Architecture: amd64
+Maintainer: Rafael Diniz <rafael@riseup.net>
+Installed-Size: 997
+Depends: libc6 (>= 2.34), sysvinit-utils (>= 3.05-4~)
+Recommends: pm-utils
+Suggests: oss4-modules
+Breaks: linux-sound-base
+Replaces: linux-sound-base
+Section: sound
+Priority: optional
+Homepage: http://www.4front-tech.com/
+Description: Open Sound System - base package
+ Open Sound System (OSS) is an attempt in unifying the digital audio
+ architecture for UNIX.
+ .
+ This package contains various utilities for configuring and using OSS
+ .
+ For OSS to work on a system with a given sound card, there must be an OSS
+ driver for that card in the kernel. For Linux, a custom oss4-modules
+ package can be built from the sources in the oss4-source package using the
+ module-assistant utility.
