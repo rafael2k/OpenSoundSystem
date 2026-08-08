@@ -1,0 +1,48 @@
++ systemctl --user stop pulseaudio.service pulseaudio.socket
++ pkill -f pulseaudio
++ sleep 1
++ modprobe -r snd_hda_intel
++ modprobe -r snd_hda_codec_realtek
++ modprobe -r snd_hda_codec_generic snd_hda_scodec_component
++ rmmod oss_hdaudio
++ rmmod osscore
++ modprobe osscore
++ modprobe oss_hdaudio
+[   51.827308] oss_hdaudio: Using only 8 out of 9 available output engines
+[   51.827480] oss_hdaudio: HDA codec 0x00000000 not known yet
+[   51.827645] oss_hdaudio: HDA codec 0x00000000 not known yet
+[   51.827707] oss_hdaudio: No hdaudio codecs were detected
+[   51.827720] oss_hdaudio: oss_hdaudio: init_HDA failed, cleaning up
+[   51.827797] oss_hdaudio 0000:00:1f.3: probe with driver oss_hdaudio failed with error -5
++ dmesg
++ grep -E 'oss_hdaudio|ALC298|codec|Codec|DMA'
++ tail -20
+[    2.292448] DMAR: dmar1: Using Queued invalidation
+[    2.294207] DMAR: Intel(R) Virtualization Technology for Directed I/O
+[    2.294209] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+[    3.082708] ata4: SATA max UDMA/133 abar m2048@0xe594c000 port 0xe594c280 irq 157 lpm-pol 3
+[    3.430775] ata4.00: ATAPI: HL-DT-ST DVDRAM GUB0N, LVE1, max UDMA/133
+[    3.442589] ata4.00: configured for UDMA/133
+[    7.506394] snd_hda_codec_realtek hdaudioC0D0: autoconfig for ALC298: line_outs=1 (0x14/0x0/0x0/0x0/0x0) type:speaker
+[    7.506398] snd_hda_codec_realtek hdaudioC0D0:    speaker_outs=0 (0x0/0x0/0x0/0x0/0x0)
+[    7.506400] snd_hda_codec_realtek hdaudioC0D0:    hp_outs=2 (0x17/0x21/0x0/0x0/0x0)
+[    7.506402] snd_hda_codec_realtek hdaudioC0D0:    mono: mono_out=0x0
+[    7.506402] snd_hda_codec_realtek hdaudioC0D0:    inputs:
+[    7.506403] snd_hda_codec_realtek hdaudioC0D0:      Internal Mic=0x12
+[    7.506405] snd_hda_codec_realtek hdaudioC0D0:      Mic=0x18
+[    7.506405] snd_hda_codec_realtek hdaudioC0D0:      Dock Mic=0x19
+[   51.827308] oss_hdaudio: Using only 8 out of 9 available output engines
+[   51.827480] oss_hdaudio: HDA codec 0x00000000 not known yet
+[   51.827645] oss_hdaudio: HDA codec 0x00000000 not known yet
+[   51.827707] oss_hdaudio: No hdaudio codecs were detected
+[   51.827720] oss_hdaudio: oss_hdaudio: init_HDA failed, cleaning up
+[   51.827797] oss_hdaudio 0000:00:1f.3: probe with driver oss_hdaudio failed with error -5
++ echo '--- /dev/oss ---'
+--- /dev/oss ---
++ ls /dev/oss/
+++ ls /dev/oss/oss_hdaudio0/pcm0
+++ head -1
++ PCM=
++ '[' -n '' ']'
++ echo 'No OSS hdaudio PCM device found'
+No OSS hdaudio PCM device found

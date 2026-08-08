@@ -112,6 +112,8 @@ oss_dma_map_del (void *va, dma_addr_t * dma)
 int
 oss_dma_capable (oss_device_t * osdev)
 {
+  if (osdev == NULL)
+    return 0;
   if (osdev->dip != NULL && osdev->dip->pcidev != NULL)
     return 1;
   return 0;
@@ -126,12 +128,17 @@ void *
 oss_dma_alloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
 	       oss_native_word * phaddr)
 {
-  struct device *dev = osdev->dip->dev;
+  struct device *dev;
   dma_addr_t dma_handle;
   void *buf;
   int flags = 0;
 
   *phaddr = 0;
+
+  if (osdev == NULL || osdev->dip == NULL || osdev->dip->dev == NULL)
+    return NULL;
+
+  dev = osdev->dip->dev;
 
 #ifdef GFP_DMA32
   if (memlimit < 0x0000000100000000LL)
@@ -164,8 +171,13 @@ oss_dma_alloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
 void
 oss_dma_free (oss_device_t * osdev, void *p, int size)
 {
-  struct device *dev = osdev->dip->dev;
+  struct device *dev;
   dma_addr_t dma_handle;
+
+  if (osdev == NULL || osdev->dip == NULL || osdev->dip->dev == NULL)
+    return;
+
+  dev = osdev->dip->dev;
 
   if (oss_dma_map_del (p, &dma_handle) < 0)
     return;

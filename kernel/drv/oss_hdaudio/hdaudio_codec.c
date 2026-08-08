@@ -1957,7 +1957,28 @@ attach_codec (hdaudio_mixer_t * mixer, int cad, char *hw_info,
 
   corb_write (mixer, cad, 0, 0, SET_POWER_STATE, 0);	/* Power up everything */
 
-  if (!corb_read (mixer, cad, 0, 0, GET_PARAMETER, HDA_VENDOR, &a, &b))
+  /*
+   * Reset the codec. This is needed because a previous driver (ALSA) may
+   * have left the codec in a powered down state where it no longer
+   * responds to verbs (reads return zero).
+   */
+  corb_write (mixer, cad, 0, 0, SET_CODEC_RESET, 0);
+
+  /* Codec reset takes up to 250 ms (HDA spec) */
+  oss_udelay (250000);
+
+  corb_write (mixer, cad, 0, 0, SET_POWER_STATE, 0);	/* Power up again */
+  oss_udelay (10000);
+
+  for (i = 0; i < 3; i++)
+    {
+      if (corb_read (mixer, cad, 0, 0, GET_PARAMETER, HDA_VENDOR, &a, &b) &&
+	  a != 0)
+	break;
+      oss_udelay (10000);
+    }
+
+  if (i == 3)
     {
       if (group_type == 1)
          {
