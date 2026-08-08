@@ -231,9 +231,11 @@ rirb_intr (hda_devc_t * devc)
 		  devc->rirb_upper = upper;
 		  devc->rirb_lower = lower;
 		  devc->rirb_empty--;
+#if 0
 		  cmn_err (CE_NOTE,
 			   "oss_hdaudio: RIRB entry %d: upper=%08x lower=%08x\n",
 			   rp, upper, lower);
+#endif
 		}
 	    }
 	  MUTEX_EXIT_IRQRESTORE (devc->mutex, flags);
@@ -1224,13 +1226,6 @@ setup_controller (hda_devc_t * devc)
   tmp = (devc->corb_phys >> 32) & 0xffffffff;
   PCI_WRITEL (devc->osdev, devc->azbar + HDA_CORBUBASE, tmp);
 
-  cmn_err (CE_NOTE,
-	   "oss_hdaudio: readback corblb=%08x corbub=%08x (expect %08x %08x)\n",
-	   PCI_READL (devc->osdev, devc->azbar + HDA_CORBLBASE),
-	   PCI_READL (devc->osdev, devc->azbar + HDA_CORBUBASE),
-	   (unsigned int) (devc->corb_phys & 0xffffffff),
-	   (unsigned int) ((devc->corb_phys >> 32) & 0xffffffff));
-
   PCI_WRITEW (devc->osdev, devc->azbar + HDA_CORBWP, 0x0);	/* Reset to 0 */
   PCI_WRITEW (devc->osdev, devc->azbar + HDA_CORBRP, 0x8000);	/* Reset to 0 */
   PCI_WRITEB (devc->osdev, devc->azbar + HDA_CORBCTL, 0x02);	/* Start */
@@ -1270,6 +1265,7 @@ setup_controller (hda_devc_t * devc)
   /* Sync the software read pointer with the hardware write pointer */
   devc->rirb_rp = PCI_READB (devc->osdev, devc->azbar + HDA_RIRBWP) & 0x00ff;
 
+#if 0
   cmn_err (CE_NOTE,
 	   "oss_hdaudio: setup_controller: corb=%08x%08x rirb=%08x%08x corbwp=%02x corbrp=%02x rirbwp=%02x rirbsts=%02x\n",
 	   (unsigned int) (devc->corb_phys >> 32), (unsigned int) devc->corb_phys,
@@ -1278,6 +1274,7 @@ setup_controller (hda_devc_t * devc)
 	   PCI_READB (devc->osdev, devc->azbar + HDA_CORBRP),
 	   PCI_READB (devc->osdev, devc->azbar + HDA_RIRBWP),
 	   PCI_READB (devc->osdev, devc->azbar + HDA_RIRBSTS));
+#endif
 
   return 1;
 }

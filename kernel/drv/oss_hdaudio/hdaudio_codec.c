@@ -1968,9 +1968,11 @@ attach_codec (hdaudio_mixer_t * mixer, int cad, char *hw_info,
 	int rdok;
 
 	rdok = corb_read (mixer, cad, 0, 0, GET_PARAMETER, HDA_VENDOR, &a, &b);
+#if 0
 	cmn_err (CE_NOTE,
 		 "attach_codec: cad=%d attempt=%d rdok=%d a=%08x b=%08x\n",
 		 cad, nretry, rdok, a, b);
+#endif
 	if (rdok && a != 0)
 	  break;
 	oss_udelay (10000);
