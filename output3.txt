@@ -1,0 +1,66 @@
++ systemctl --user stop pulseaudio.service pulseaudio.socket
++ pkill -f pulseaudio
++ sleep 1
++ modprobe -r snd_hda_intel
++ modprobe -r snd_hda_codec_realtek
++ modprobe -r snd_hda_codec_generic snd_hda_scodec_component
++ rmmod oss_hdaudio
++ rmmod osscore
++ modprobe osscore
++ modprobe oss_hdaudio
+[   25.420243] oss_hdaudio: oss_hdaudio: setup_controller: corb=00000000fffed000 rirb=00000000fffed800 corbwp=00 corbrp=00 rirbwp=00 rirbsts=00
+[   25.420269] oss_hdaudio: Using only 8 out of 9 available output engines
+[   25.420363] oss_hdaudio: oss_hdaudio: RIRB entry 1: upper=00000000 lower=00000000
+[   25.420403] oss_hdaudio: oss_hdaudio: RIRB entry 2: upper=00000000 lower=00000000
+[   25.420422] oss_hdaudio: oss_hdaudio: RIRB entry 3: upper=00000000 lower=00000000
+[   25.430354] oss_hdaudio: oss_hdaudio: RIRB entry 4: upper=00000000 lower=00000000
+[   25.430374] oss_hdaudio: attach_codec: cad=0 attempt=0 rdok=1 a=00000000 b=00000000
+[   25.440414] oss_hdaudio: oss_hdaudio: RIRB entry 5: upper=00000000 lower=00000000
+[   25.440431] oss_hdaudio: attach_codec: cad=0 attempt=1 rdok=1 a=00000000 b=00000000
+[   25.450476] oss_hdaudio: oss_hdaudio: RIRB entry 6: upper=00000000 lower=00000000
+[   25.450492] oss_hdaudio: attach_codec: cad=0 attempt=2 rdok=1 a=00000000 b=00000000
+[   25.460456] oss_hdaudio: attach_codec: Codec #0 is not physically present
+[   25.460540] oss_hdaudio: oss_hdaudio: RIRB entry 7: upper=00000000 lower=00000000
+[   25.460563] oss_hdaudio: oss_hdaudio: RIRB entry 8: upper=00000000 lower=00000000
+[   25.460584] oss_hdaudio: oss_hdaudio: RIRB entry 9: upper=00000000 lower=00000000
+[   25.470498] oss_hdaudio: oss_hdaudio: RIRB entry 10: upper=00000000 lower=00000000
+[   25.470514] oss_hdaudio: attach_codec: cad=0 attempt=0 rdok=1 a=00000000 b=00000000
+[   25.480562] oss_hdaudio: oss_hdaudio: RIRB entry 11: upper=00000000 lower=00000000
+[   25.480578] oss_hdaudio: attach_codec: cad=0 attempt=1 rdok=1 a=00000000 b=00000000
+[   25.490622] oss_hdaudio: oss_hdaudio: RIRB entry 12: upper=00000000 lower=00000000
+[   25.490642] oss_hdaudio: attach_codec: cad=0 attempt=2 rdok=1 a=00000000 b=00000000
+[   25.500605] oss_hdaudio: No hdaudio codecs were detected
+[   25.500614] oss_hdaudio: oss_hdaudio: init_HDA failed, cleaning up
+[   25.500717] oss_hdaudio 0000:00:1f.3: probe with driver oss_hdaudio failed with error -5
++ dmesg
++ grep -E 'oss_hdaudio|ALC298|codec|Codec|DMA'
++ tail -20
+[   25.420422] oss_hdaudio: oss_hdaudio: RIRB entry 3: upper=00000000 lower=00000000
+[   25.430354] oss_hdaudio: oss_hdaudio: RIRB entry 4: upper=00000000 lower=00000000
+[   25.430374] oss_hdaudio: attach_codec: cad=0 attempt=0 rdok=1 a=00000000 b=00000000
+[   25.440414] oss_hdaudio: oss_hdaudio: RIRB entry 5: upper=00000000 lower=00000000
+[   25.440431] oss_hdaudio: attach_codec: cad=0 attempt=1 rdok=1 a=00000000 b=00000000
+[   25.450476] oss_hdaudio: oss_hdaudio: RIRB entry 6: upper=00000000 lower=00000000
+[   25.450492] oss_hdaudio: attach_codec: cad=0 attempt=2 rdok=1 a=00000000 b=00000000
+[   25.460456] oss_hdaudio: attach_codec: Codec #0 is not physically present
+[   25.460540] oss_hdaudio: oss_hdaudio: RIRB entry 7: upper=00000000 lower=00000000
+[   25.460563] oss_hdaudio: oss_hdaudio: RIRB entry 8: upper=00000000 lower=00000000
+[   25.460584] oss_hdaudio: oss_hdaudio: RIRB entry 9: upper=00000000 lower=00000000
+[   25.470498] oss_hdaudio: oss_hdaudio: RIRB entry 10: upper=00000000 lower=00000000
+[   25.470514] oss_hdaudio: attach_codec: cad=0 attempt=0 rdok=1 a=00000000 b=00000000
+[   25.480562] oss_hdaudio: oss_hdaudio: RIRB entry 11: upper=00000000 lower=00000000
+[   25.480578] oss_hdaudio: attach_codec: cad=0 attempt=1 rdok=1 a=00000000 b=00000000
+[   25.490622] oss_hdaudio: oss_hdaudio: RIRB entry 12: upper=00000000 lower=00000000
+[   25.490642] oss_hdaudio: attach_codec: cad=0 attempt=2 rdok=1 a=00000000 b=00000000
+[   25.500605] oss_hdaudio: No hdaudio codecs were detected
+[   25.500614] oss_hdaudio: oss_hdaudio: init_HDA failed, cleaning up
+[   25.500717] oss_hdaudio 0000:00:1f.3: probe with driver oss_hdaudio failed with error -5
++ echo '--- /dev/oss ---'
+--- /dev/oss ---
++ ls /dev/oss/
+++ ls /dev/oss/oss_hdaudio0/pcm0
+++ head -1
++ PCM=
++ '[' -n '' ']'
++ echo 'No OSS hdaudio PCM device found'
+No OSS hdaudio PCM device found

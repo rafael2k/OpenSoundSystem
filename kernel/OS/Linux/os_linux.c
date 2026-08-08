@@ -62,21 +62,24 @@ oss_pci_byteswap (oss_device_t * osdev, int mode)
 
 /*
  * Mapping table for DMA buffers allocated with dma_alloc_coherent().
- * Used to recover the bus address when freeing the buffer.
+ * Used to recover the bus address when freeing the buffer. The device is
+ * stored too, because the buffer may be freed with a different (or NULL)
+ * osdev than the one used for the allocation (vmix subdevices).
  */
-#define OSS_DMA_MAP_MAX 32
+#define OSS_DMA_MAP_MAX 128
 
 struct oss_dma_map_entry
 {
   void *va;
   dma_addr_t dma;
   int size;
+  struct device *dev;
 };
 
 static struct oss_dma_map_entry oss_dma_map[OSS_DMA_MAP_MAX];
 
 static int
-oss_dma_map_add (void *va, dma_addr_t dma, int size)
+oss_dma_map_add (void *va, dma_addr_t dma, int size, struct device *dev)
 {
   int i;
 
@@ -86,6 +89,7 @@ oss_dma_map_add (void *va, dma_addr_t dma, int size)
 	oss_dma_map[i].va = va;
 	oss_dma_map[i].dma = dma;
 	oss_dma_map[i].size = size;
+	oss_dma_map[i].dev = dev;
 	return 0;
       }
 
@@ -94,7 +98,8 @@ oss_dma_map_add (void *va, dma_addr_t dma, int size)
 }
 
 static int
-oss_dma_map_del (void *va, dma_addr_t * dma)
+oss_dma_map_del (void *va, dma_addr_t * dma, int *size,
+		 struct device **dev)
 {
   int i;
 
@@ -102,6 +107,8 @@ oss_dma_map_del (void *va, dma_addr_t * dma)
     if (oss_dma_map[i].va == va)
       {
 	*dma = oss_dma_map[i].dma;
+	*size = oss_dma_map[i].size;
+	*dev = oss_dma_map[i].dev;
 	oss_dma_map[i].va = NULL;
 	return 0;
       }
@@ -116,6 +123,17 @@ oss_dma_capable (oss_device_t * osdev)
     return 0;
   if (osdev->dip != NULL && osdev->dip->pcidev != NULL)
     return 1;
+  return 0;
+}
+
+int
+oss_dma_has (void *p)
+{
+  int i;
+
+  for (i = 0; i < OSS_DMA_MAP_MAX; i++)
+    if (oss_dma_map[i].va == p)
+      return 1;
   return 0;
 }
 
@@ -158,7 +176,7 @@ oss_dma_alloc (oss_device_t * osdev, int size, oss_uint64_t memlimit,
       return NULL;
     }
 
-  if (oss_dma_map_add (buf, dma_handle, size) < 0)
+  if (oss_dma_map_add (buf, dma_handle, size, dev) < 0)
     {
       dma_free_attrs (dev, size, buf, dma_handle, 0);
       return NULL;
@@ -173,19 +191,15 @@ oss_dma_free (oss_device_t * osdev, void *p, int size)
 {
   struct device *dev;
   dma_addr_t dma_handle;
+  int stored_size;
 
-  if (osdev == NULL || osdev->dip == NULL || osdev->dip->dev == NULL)
+  if (oss_dma_map_del (p, &dma_handle, &stored_size, &dev) < 0)
     return;
 
-  dev = osdev->dip->dev;
+  if (stored_size < PAGE_SIZE)
+    stored_size = PAGE_SIZE;
 
-  if (oss_dma_map_del (p, &dma_handle) < 0)
-    return;
-
-  if (size < PAGE_SIZE)
-    size = PAGE_SIZE;
-
-  dma_free_attrs (dev, size, p, dma_handle, 0);
+  dma_free_attrs (dev, stored_size, p, dma_handle, 0);
 }
 
 int

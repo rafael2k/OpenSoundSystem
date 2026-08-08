@@ -919,7 +919,13 @@ oss_contig_free (oss_device_t * osdev, void *p, int buffsize)
   if (p == NULL)
     return;
 
-  if (oss_dma_capable (osdev))
+  /*
+   * The buffer may have been allocated through the DMA API even when the
+   * osdev passed here is different (or NULL): vmix subdevices free their
+   * buffers with their own (NULL) osdev while the allocation was done
+   * with the parent PCI device. The va->dma table knows the truth.
+   */
+  if (oss_dma_capable (osdev) || oss_dma_has (p))
     {
       oss_dma_free (osdev, p, buffsize);
       return;
