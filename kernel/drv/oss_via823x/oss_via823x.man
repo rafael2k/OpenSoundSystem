@@ -14,7 +14,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_via823x.conf Device configuration 
+CONFIGFILEPATH/oss_via823x.conf  Device configuration 
 
 AUTHOR
 4Front Technologies

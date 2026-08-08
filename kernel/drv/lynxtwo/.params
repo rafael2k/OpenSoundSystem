@@ -1,0 +1,8 @@
+int lynxtwo_init_order=0;
+/*
+ * lynxtwo_init_order determines if the output devices files are created before
+ * the input ones (0) or vice versa (1).
+ *
+ * This may be necessary with a known application which expect all /dev/dsp#
+ * devices to be recording devices.
+ */

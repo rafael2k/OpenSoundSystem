@@ -1,0 +1,3 @@
+BLDDIR=/home/rafael2k/programs/devel/OpenSoundSystem/build-tree/oss-build/noregparm
+SRCDIR=/home/rafael2k/programs/devel/OpenSoundSystem
+OSSLIBDIR=/usr/lib/oss

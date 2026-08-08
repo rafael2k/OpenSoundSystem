@@ -1,7 +1,17 @@
 /*
  * Purpose: File format parse routines for ossplay
  */
-#define COPYING Copyright (C) Hannu Savolainen and Dev Mazumdar 2000-2008. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #include "ossplay_parser.h"
 #include "ossplay_decode.h"
@@ -754,7 +764,7 @@ play_voc (dspdev_t * dsp, const char * filename, int fd, unsigned char * hdr,
          pos = l + 7, tmp, vers;
   unsigned char buf[256], block_type;
   flag plock = 0;
-  int speed = 11025, channels = 1, bits = 8, format = AFMT_U8;
+  int speed = 11025, channels = 1, bits __attribute__((unused)) = 8, format = AFMT_U8;
   errors_t ret;
 
   if (read (fd, hdr + 19, 7) < 7)
@@ -1675,7 +1685,7 @@ static int
 caf_desc_parse (uint32 id, unsigned char * buf, big_t len, file_t * f)
 {
   int format;
-  uint32 bits, bytes_per_packet, flags, frames_per_packet;
+  uint32 bits, bytes_per_packet, flags, frames_per_packet __attribute__((unused));
 
   {
     /*

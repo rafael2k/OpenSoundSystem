@@ -70,7 +70,7 @@ copy_parms (FILE * f, FILE * conf)
 static void
 scan_dir (const char *srcdir, const char *modnam)
 {
-  char confname[256], tmp[256], line[1024];
+  char confname[1024], tmp[256], line[1024];
   char module[256], *p;
   FILE *conf;
   FILE *f;

@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/SunOS/__xtol-i86pc-i386.s

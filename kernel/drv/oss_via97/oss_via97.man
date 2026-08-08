@@ -13,7 +13,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_via97.conf Device configuration file.
+CONFIGFILEPATH/oss_via97.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

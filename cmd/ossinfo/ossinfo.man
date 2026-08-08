@@ -8,7 +8,7 @@ DESCRIPTION
 The ossinfo program displays OSS device information.
 
 OPTIONS
--v#		Verbose output. Number indicates level of verobisity (0-9).
+-v#		Verbose output. Number indicates level of verbosity (0-9).
 -p		Display only physical audio/midi devices
 -g		Display ALL audio/midi/mixer devices (physical and virtual)
 -a		Display audio device files

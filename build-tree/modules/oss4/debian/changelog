@@ -1,0 +1,497 @@
+oss4 (4.2-build2020-10) unstable; urgency=medium
+
+  * This fork adds working audio support for the Lenovo ThinkPad P70
+    (Intel SPT/KBL-LP HDA controller 8086:9d71 + Realtek ALC298 codec)
+  * oss_hdaudio: support modern Intel HDA controllers (SKL/KBL/CNL/CML/
+    ICL/TGL/ADL/RPL/APL/GML + earlier HSW/BDW/BYT/BSW) and Realtek ALC298
+  * Fix DMA under IOMMU (dma_alloc_attrs with va->dma table, table-driven
+    free for vmix subdevices), codec vendor probe, RIRB state reset
+  * Verified working on Debian 13 kernel 6.12.101 (ALC298 on ThinkPad,
+    audio plays via /dev/dsp)
+
+ -- Rafael Diniz <rafael@riseup.net>  Sat, 08 Aug 2026 02:05:00 +0000
+
+oss4 (4.2-build2020-9) unstable; urgency=medium
+
+  * Rebase Debian packaging on deb-multimedia (Christian Marillat) oss4-dmo:
+    restore oss4-base, oss4-gtk, oss4-dkms, oss4-source, oss4-dev packages
+    with kernel driver build (dkms) and modern-kernel patch set applied
+    in-tree (mregparm guard, linux/io, proc_ops, time_t, kernel includes,
+    module symbols for >= 6.2).
+  * oss4-dkms: enable oss_usb driver (USB audio, required for radio
+    sound card use); exclude lynxtwo from the dkms tree.
+  * liboss4-salsa-dev: enable on Linux (linux-any).
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 14:00:00 +0000
+
+oss4 (4.2-build2020-8) unstable; urgency=medium
+
+  * liboss4-salsa-dev: Enable on Linux (linux-any). The package conflicts
+    with libasound2-dev by design; install only on OSS-exclusive systems.
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 13:00:00 +0000
+
+oss4 (4.2-build2020-7) unstable; urgency=medium
+
+  * Fork update: apply Debian libsalsa patch set directly in-tree and
+    remove debian/patches (quilt series no longer used).
+  * Include Arch Linux AUR kernel-compat fixes (osscore, ossvermagic,
+    extramodules, soundon, rm-init-scripts, remove-hal).
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 12:00:00 +0000
+  * patches/101_use_env_CFLAGS.patch: Fix taking CPPFLAGS and LDFLAGS into
+    account.
+  * Update standards version to 4.6.2, no changes needed.
+  * rules: Simplify and rewrite to use debhelper instead of cdbs
+    (Closes: Bug#1111846)
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 22 Aug 2025 22:57:18 +0200
+
+oss4 (4.2-build2020-5) unstable; urgency=medium
+
+  * liboss4-salsa-dev.install: Fix multiarch patch.
+  * Drop oss4-base, oss4-gtk, oss4-dkms, oss4-source, oss4-dev packages and
+    the kernel driver build infrastructure and patches (Closes: Bug#796636,
+    Bug#1101743)
+  * salsa-ci.yml: Add hurd CI.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 09 Mar 2025 22:05:03 +0100
+
+oss4 (4.2-build2020-4) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * oss4-dev.postrm: Drop purge case, remove will have already called it. Add
+    abort-install case.
+  * debian/oss4-dev.install: Do not install soundcard.h (Closes: Bug#1099702)
+
+  [ Andreas Beckmann ]
+  * Declare Testsuite: autopkgtest-pkg-dkms.
+  * Exclude the unused oss_usb module which fails to build for kernels without
+    CONFIG_USB, e.g. the -cloud- flavors.
+  * dkms.conf: Declare BUILD_EXCLUSIVE_KERNEL_MIN="5.15" for using
+    linux/stdarg.h.
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 07 Mar 2025 00:03:41 +0100
+
+oss4 (4.2-build2020-3) unstable; urgency=medium
+
+  * patches/implicit: Fix build with qa=+bug-implicit-func.
+
+ -- Samuel Thibault <sthibault@debian.org>  Wed, 13 Mar 2024 20:00:09 +0100
+
+oss4 (4.2-build2020-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Update libasound2 provides for 64-bit time_t transition
+    (Closes: Bug#1064301).
+  * Use explicit Provides: for libasound2 compat on 64-bit archs since
+    debhelper won't be able to work this out given 't64' is not in the
+    package name.
+
+ -- Steve Langasek <vorlon@debian.org>  Mon, 19 Feb 2024 19:59:19 +0000
+
+oss4 (4.2-build2020-2) unstable; urgency=medium
+
+  * control: Drop dependency on now-obsolete lsb-base.
+  * patches/nogtk2: Drop ossxmix.
+  * control: Drop gtk2 build-deps (Closes: #967677).
+
+ -- Samuel Thibault <sthibault@debian.org>  Sat, 05 Aug 2023 02:12:47 +0200
+
+oss4 (4.2-build2020-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * New upstream release.
+    - patches/003_linux-error-logging-fixes.patch: Refresh.
+    - patches/201_arch_without_mregparm.patch: Refresh.
+    - patches/202_fix_invalid_printf.patch: Refresh.
+    - patches/402_os_cmd.patch: Refresh.
+    - patches/503_glibc_2.28.patch: Partly upstreamed.
+    - Closes: #919246.
+    - patches/include.patch: Fix including headers.
+    - patches/fixes.patch: Various fixes.
+  * control: Bump Standards-Version to 4.6.0 (no change)
+  * oss4-dkms.dkms.in: Fix using M= instead of SUBDIRS=.
+  * create-ma-tree.sh: Add -Wno-error.
+  * create-ma-tree.sh: Fix including core's Module.symvers.
+  * create-ma-tree.sh: Blacklist lynxtwo driver.
+  * create-ma-tree.sh: Fix including headers.
+  * create-ma-tree.sh: Fix endianness macros.
+  * control: Build-dep on dh-dkms instead of dkms (Closes: #1027888).
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + Build-Depends: Drop versioned constraint on tar.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 08 Jan 2023 20:31:03 +0100
+
+oss4 (4.2-build2017-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * control: Fix VCS URLs.
+  * rules: Rely on pre-initialized dpkg-architecture variables.
+  * control: Bump Standards-Version to 4.5.0 (no change).
+  * control: Silent lintian warning about weak dependency version.
+  * control: make oss4-base depend on lsb-base for sourcing
+    /lib/lsb/init-functions.
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Remove maintainer from uploaders.
+  * Bump debhelper from deprecated 9 to 10.
+  * Use canonical URL in Vcs-Browser, Vcs-Git.
+
+  [ Thadeu Lima de Souza Cascardo ]
+  * Fix build on ppc64el with binutils 2.35 (Closes: #968413).
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 31 Dec 2020 11:00:14 +0100
+
+oss4 (4.2-build2017-1) unstable; urgency=low
+
+  [ Sébastien Noel ]
+  * New upstream release.
+
+  [ Samuel Thibault ]
+  * New upstream release. (Closes: #827674)
+  * control: Bump Standards-Version to 3.9.8 (no change).
+  * 30oss4-pm, oss4-dkms.postinst: invoke-rc.d is now essential.
+  * Use https URL
+  * 503_glibc_2.28.patch: Fix build against glibc 2.28 (Closes: #916005)
+  * 501_linux_version.patch: Drop, fixed upstream.
+  * debian/include-alsa/alsa/mixer.h: Fix
+    snd_mixer_selem_set_playback_volume_range prototype (Closes: #620627).
+  * debian/include-alsa/alsa/version.h: Bump alsa version accordingly.
+  * Set myself as maintainer until an oss4 team is reassembled.
+  * rules: Drop spurious .o upstream files.
+
+  [ Reiner Herrmann ]
+  * Reproducible build fixes (Closes: #834993)
+  * Use system txt2man in upstream build script (build.sh), which supports
+    SOURCE_DATE_EPOCH.
+  * Use SOURCE_DATE_EPOCH for the generated build-id.
+  * Sort files in modules tarball, fix permissions and timestamps.
+  * Fix ordering issues in some other places.
+
+ -- Samuel Thibault <sthibault@debian.org>  Tue, 08 Jan 2019 23:51:07 +0100
+
+oss4 (4.2-build2010-5) unstable; urgency=medium
+
+  * rules: Don't install libasound.so.2 link in liboss4-salsa-dev...
+    (Closes: #783301)
+  * control: ... make it depend on liboss4-salsa-asound2 instead.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 31 Jan 2016 13:35:48 +0100
+
+oss4 (4.2-build2010-4) unstable; urgency=medium
+
+  * 502_linux_io.patch: Fix build on non-x86 Linux.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sat, 26 Sep 2015 01:37:39 +0200
+
+oss4 (4.2-build2010-3) unstable; urgency=medium
+
+  * debian/include-alsa/alsa/mixer.h: Update enum _snd_mixer_selem_channel_id
+    to newer ALSA. Fixes some MATE builds.
+  * 501_linux_version.patch: Fix build under Linux 4.x.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sat, 26 Sep 2015 00:25:31 +0200
+
+oss4 (4.2-build2010-2) unstable; urgency=medium
+
+  * Disable USB drivers, which insufficiently validate USB device descriptors.
+    (Closes: #775662)
+
+ -- Samuel Thibault <sthibault@debian.org>  Mon, 09 Mar 2015 20:16:31 +0100
+
+oss4 (4.2-build2010-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add dependency on libc-dev for oss4-dkms to avoid build failure when
+    compiling the module (Closes: #768394)
+
+ -- Tobias Frost <tobi@debian.org>  Sat, 22 Nov 2014 16:22:36 +0100
+
+oss4 (4.2-build2010-1) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * New upstream release.
+    - fix build with recent kernel. (Closes: #696751)
+  * Add build dependency on libtool-bin. (Closes: #761783)
+
+  [ Benda Xu ]
+  * Use debhelper 9.
+  * Bump to standard 3.9.6.
+  * Add Benda Xu to uploaders.
+  * Run wrap-and-sort.
+  * Canonicalize Vcs-Svn field and add Vcs-Browser field.
+  * Get rid of limits.h copy hack, leverage include-fixed from gcc.
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Thu, 23 Oct 2014 22:47:56 +0200
+
+oss4 (4.2-build2007-2.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix to find kernel header (Michal Suchanek). Closes: #713841.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 15 Oct 2014 13:56:56 +0200
+
+oss4 (4.2-build2007-2.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Build-depend on libtool-bin. Closes: #761779.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 09 Oct 2014 10:02:33 +0000
+
+oss4 (4.2-build2007-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Downgrade the linux-headers dependency to recommends.
+    (Closes: #728267)
+
+ -- Philipp Kern <pkern@debian.org>  Sat, 23 Nov 2013 15:23:32 +0100
+
+oss4 (4.2-build2007-2) unstable; urgency=medium
+
+  * Revert changes from the previous NMU, it breaks more things
+    than it fixes.
+  * Until a *tested* patch is proposed, VMIX is now using
+    fixed point arithmetic in the kernel.
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Tue, 04 Dec 2012 20:53:17 +0100
+
+oss4 (4.2-build2007-1+nmu1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Disable preemption in functions touching control registers
+    - Patch thanks to Roland Stigge (closes: #693659).
+
+ -- Michael Gilbert <mgilbert@debian.org>  Sat, 24 Nov 2012 06:55:01 +0000
+
+oss4 (4.2-build2007-1) unstable; urgency=low
+
+  * New upstream release.
+  * Acknowledge NMU, thanks Michael Gilbert.
+  * Add debian/patches/110_ld-as-needed.patch: Rearrange order of linker
+    arguments to fix building with "ld --as-needed" (closes: #630737).
+  * Add missing dependency on dpkg-dev to oss4-dkms and oss4-source
+    (closes: #687086).
+  * Fix typo in the changelog (closes: #628876, #675933)
+  * Add debian/patches/002_fix-linux-oss_native_word.patch (closes: #693662).
+    Thanks to Ben Hutchings.
+  * Add debian/patches/003_linux-error-logging-fixes.patch (closes: #693657).
+    Thanks to Ben Hutchings.
+  * check for /lib/modules/${kernelver}/build in addition of
+    /lib/modules/${kernelver}/source (closes: #587191).
+  * oss4-dkms.dkms.in: fix 'CLEAN' rules (closes: #653374).
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Mon, 19 Nov 2012 11:47:24 +0100
+
+oss4 (4.2-build2006-2+nmu1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Drop linux-sound-base dependency, break and replace it (closes: #690574)
+    - Directly include OSS-module-list and ALSA-module-list.
+
+ -- Michael Gilbert <mgilbert@debian.org>  Wed, 14 Nov 2012 01:47:48 +0000
+
+oss4 (4.2-build2006-2) unstable; urgency=low
+
+  * Fix non-Linux builds: generate alsa.pc from the libsalsa build rule.
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 17 May 2012 18:07:38 +0200
+
+oss4 (4.2-build2006-1) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * New upstream release.
+  * control: Bump Standards-Version to 3.9.3 (no changes).
+
+  [ Samuel Thibault ]
+  * control: Set liboss4-salsa2 and liboss4-salsa-asound2 mult-arch: same. Set
+    liboss4-salsa-asound2 architecture: any to build symlink for each arch.
+    Update my email address.
+  * alsa.pc: rename to alsa.pc.in
+  * liboss4-salsa-dev.install: Remove library rules.
+  * liboss4-salsa-asound2.links: Remove.
+  * liboss4-salsa2.install: Remove.
+  * liboss4-salsa-dev.links: Remove
+  * oss4-base.install: Do not use braces, this is actually not supported.
+  * rules: Install libraries to multiarch path. Add multiarch path to alsa.pc.
+    Remove alsa.pc on clean. Put back libOSS.so to private (but multiarched)
+    directory.
+
+ -- Samuel Thibault <sthibault@debian.org>  Mon, 26 Mar 2012 01:05:03 +0200
+
+oss4 (4.2-build2005-3) unstable; urgency=low
+
+  * Enable build of liboss4-salsa-dev on !linux only.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sat, 18 Feb 2012 13:08:30 +0100
+
+oss4 (4.2-build2005-2) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * Merge Samuel Thibault 's changes in debian/rules: do not prepare oss4
+    on hurd-any. Should fixes FTBFS on hurd-any.
+  * Reintroduce an oss4-source package. I realy dislike DKMS.
+  * Fix oss4-dkms's install failure, thanks to Michel Briand
+    (closes: #653374).
+  * Fix compilation on i386, closes: #645537.
+
+  [ Samuel Thibault ]
+  * debian/control: Make oss4-gtk depend on oss4-base on linux-any only
+    (closes: #647271).
+  * debian/rules: Remove debian/oss4-dkms.dkms on clean.
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Thu, 29 Dec 2011 21:22:42 +0100
+
+oss4 (4.2-build2005-1) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * New upstream release.
+  * debian/patches/os_cmd: add a new option to ossdetect to choose
+    the devices nodes' owner (Closes: #632296).
+  * add debian/patches/gcc-4.6.patch (Closes: #625398).
+  * add debian/patches/kfreebsd-gnu.patch to build liboss4-salsa2
+    and oss4-gtk on GNU/kFreeBSD, thanks to Robert Millan! (Closes: #636631).
+  * debian/control: stop providing libasound-dev (Closes: #644685).
+  * debian/create-ma-tree.sh: fix oss4-dkms installation (Closes: #640829).
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Sat, 15 Oct 2011 15:22:51 +0200
+
+oss4 (4.2-build2004-1) unstable; urgency=low
+
+  [ Samuel Thibault ]
+  * debian/control: Add liboss4-salsa2, liboss4-salsa-dev and
+    liboss4-salsa-asound2 packages, equivalent to (and will replace) those from
+    the oss-libsalsa package (Closes: #589127).
+  * debian/patches/liboss4-salsa.patch: New patch to rename libsalsa into
+    liboss4-salsa to avoid conflicts in the archive for no good reason.
+  * debian/rules: Make in libOSSlib and libsalsa.
+  * debian/liboss4-salsa-dev.install, debian/liboss4-salsa2.install,
+    debian/liboss4-salsa-asound2.links, debian/liboss4-salsa-dev.links:
+    Install liboss4-salsa libraries like was done in the oss-libsalsa package.
+  * include-alsa: Add a copy of ALSA 1.0.5 headers: Cf ALSA_1.0.* symbols in
+    libsalsa, this is the roughly supported version.
+  * debian/copyright: Update for new include-alsa files.
+  * alsa.pc: New file for compatibility with libasound-dev.
+  * debian/control:
+    - Add Vcs-Browser and Vcs-Svn fields.
+    - Use linux-any instead of the list of Linux archs (Closes: #604679).
+    - Make dkms dependency linux-any only.
+  * debian/patches/hurd_iot.patch: New patch to fix soundcard.h usage in
+    libsalsa on hurd-i386.
+  * debian/patches/libsalsa_fixes.patch: New patch to fix some printf usages
+    and ioctl declaration in libsalsa.
+  * debian/patches/no_EBADE.patch: New patch to cope with hurd-i386 not having
+    EBADE.
+  * debian/patches/CFLAGS.patch: New patch to make oss4 take debian/rules
+    CFLAGS into account.
+  * debian/patches/snd_asoundlib_version.patch: New patch to add
+    snd_asoundlib_version().
+  * debian/patches/generic_srccconf.patch: New patch to fix source
+    configuration on unknown archs.
+
+  [ Romain Beauxis ]
+  * Fixed README.Debian to only mention dkms' modules.
+  * Switch to dpkg-source 3.0 (quilt) format
+  * Added DM-Upload-Allowed: yes
+
+  [ Sebastien NOEL ]
+  * New upstream release (Closes: #595298, #619272).
+  * Fix typo in initscript (Closes: #627149).
+  * debian/control: adjust linux-headers dependencies (Closes: #628876).
+
+ -- Romain Beauxis <toots@rastageeks.org>  Tue, 14 Jun 2011 10:06:56 -0500
+
+oss4 (4.2-build2003-1) unstable; urgency=high
+
+  * New upstream release.
+  * Removed oss4-source, set oss4-dmks as the
+    only way to compile the drivers.
+  * Reload modules in oss4-dmks' postinst when
+    called with action "configure".
+  Closes: #558034
+  * Added soundon and soundoff script to survive
+    a suspend/resume cycle. Added Recommends: pm-utils.
+  Closes: #565709
+  * Added explicit dependency on linux-headers to make sure
+    the modules' build symklink is present.
+  Closes: #587191
+  * Bumped standards-version.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Wed, 14 Jul 2010 21:16:03 -0500
+
+oss4 (4.2-build2002-3) unstable; urgency=low
+
+  * Switched to dh_dkms.
+  Closes: #564202
+  * Bumped standards-version.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Wed, 24 Mar 2010 18:43:54 -0500
+
+oss4 (4.2-build2002-2) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * oss4-source: fix debian/rules permissions. Closes: #563692.
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Wed, 06 Jan 2010 11:57:19 +0100
+
+oss4 (4.2-build2002-1) unstable; urgency=low
+
+  [ Sebastien NOEL ]
+  * New upstream release.
+    - drop patches/sharedlib.patch
+  * #491551 was fixed a long time ago, remove duplicate modprobe.d rules
+    (Closes: #558407).
+
+  [ Romain Beauxis ]
+  * Added DKMS modules.
+  * Do not execute oss4-base init.d script
+    if the package is not installed.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Mon, 07 Dec 2009 14:52:21 -0600
+
+oss4 (4.2-build2000-6) unstable; urgency=low
+
+  * Fixed FTBFS on hppa.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sun, 29 Nov 2009 15:57:05 -0600
+
+oss4 (4.2-build2000-5) unstable; urgency=low
+
+  * Fixed FTBFS on powerpc and s390.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Sun, 29 Nov 2009 09:22:39 -0600
+
+oss4 (4.2-build2000-4) unstable; urgency=low
+
+  * Fixed patches against FTBFS, this time for good..
+
+ -- Romain Beauxis <toots@rastageeks.org>  Fri, 27 Nov 2009 19:03:50 -0600
+
+oss4 (4.2-build2000-3) unstable; urgency=low
+
+  * Fixed incorrect character in patch.
+
+ -- Romain Beauxis <toots@rastageeks.org>  Fri, 27 Nov 2009 02:33:47 -0600
+
+oss4 (4.2-build2000-2) unstable; urgency=low
+
+  * Switched patch system to quilt via cdbs.
+  * Added patch to support sh4 arch, thanks to Nobuhiro Iwamatsu
+  Closes: #557909
+  * Adapted one of the above patch to also fix FTBFS on sparc and mips.
+  * Added patch to fix FTBFS due to an invalid printf.
+  Closes: #557866
+  * Added README.Debian to explain how to build the kernel modules.
+  * Removed hurd-i386, kfreebsd-amd64 and kfreebsd-i386 from the
+    list of target archs. A better solution should be investigated later..
+
+ -- Romain Beauxis <toots@rastageeks.org>  Thu, 26 Nov 2009 23:45:32 -0600
+
+oss4 (4.2-build2000-1) unstable; urgency=low
+
+  * Initial release (Closes: #483856)
+
+ -- Sebastien NOEL <sebastien@twolife.org>  Tue, 15 Sep 2009 16:41:55 +0200

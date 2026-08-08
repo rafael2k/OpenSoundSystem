@@ -1,0 +1,13 @@
+Package: liboss4-salsa2
+Source: oss4
+Version: 4.2-build2020-10
+Architecture: amd64
+Maintainer: Rafael Diniz <rafael@riseup.net>
+Installed-Size: 190
+Depends: libc6 (>= 2.14)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: http://www.4front-tech.com/
+Description: OSS to Alsa compatibility library
+ Liboss4-salsa is a library providing an ALSA interface on top of OSS.

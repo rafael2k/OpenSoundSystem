@@ -1,0 +1,13 @@
+Package: oss4-source
+Source: oss4
+Version: 4.2-build2020-10
+Architecture: amd64
+Maintainer: Rafael Diniz <rafael@riseup.net>
+Installed-Size: 872
+Depends: debhelper, dpkg-dev, make, module-assistant
+Section: sound
+Priority: optional
+Homepage: http://www.4front-tech.com/
+Description: Open Sound System - drivers sources
+ This package provides the source code for the OSS4 kernel modules, in a
+ form suitable for use by module-assistant.

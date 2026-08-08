@@ -1,6 +1,6 @@
 int hdaudio_snoopy=0;
 /*
- * hdaudio_snopy is reserved for diagnostic purposes and it must be 0
+ * hdaudio_snoopy is reserved for diagnostic purposes and it must be 0
  * in all situations. Other values may make the driver vulnerable to
  * DoS attacks. For security reasons only root can use this diagnostic
  * interface.

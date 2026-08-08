@@ -37,7 +37,7 @@ KNOWN PROBLEMS
 None
 
 FILES
-CONFIGFILEPATH/oss_midiloop.conf Device configuration file
+CONFIGFILEPATH/oss_midiloop.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

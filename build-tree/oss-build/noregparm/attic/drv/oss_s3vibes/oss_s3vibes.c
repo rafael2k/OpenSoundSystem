@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/attic/drv/oss_s3vibes/oss_s3vibes.c

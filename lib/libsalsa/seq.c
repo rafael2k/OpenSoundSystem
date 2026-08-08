@@ -111,7 +111,7 @@ snd_seq_open (snd_seq_t ** seqp, const char *name, int streams, int mode)
   if ((seq = malloc (sizeof (*seq))) == NULL)
     return -ENOMEM;
 
-  dbg_printf ("Created sequencer seq=%x\n", seq);
+  dbg_printf ("Created sequencer seq=%p\n", seq);
 
   memset (seq, 0, sizeof (*seq));
 

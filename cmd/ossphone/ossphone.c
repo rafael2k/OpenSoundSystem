@@ -2,7 +2,17 @@
  * Purpose: Utility to make phone calls using Open Sound System modem support.
  */
 
-#define COPYING Copyright (C) 2008 Paulo Matias. Licensed to 4Front Technologies
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,7 +151,7 @@ static int wait_dialtone()
   printf("Waiting for dial tone...\n");
   while (dc_level < min_dc_level)
        {
-	 int dummy;
+	 int dummy __attribute__((unused));
          modem_read(modem_in_fd, buf, sizeof(buf));
          dummy=write(dev_dsp_fd, buf, sizeof(buf));
 
@@ -177,7 +187,7 @@ dial_phone_number(const char *phone_number)
        {
          if (dtmf_fill_digit (digit, digit_len, *phone_number) >= 0)
            {
-	     int dummy;
+	     int dummy __attribute__((unused));
 
              printf("%c", *phone_number);
              fflush(stdout);
@@ -371,7 +381,7 @@ main(int argc, char **argv)
 
     while (1)
          {
-	   int dummy;
+	   int dummy __attribute__((unused));
            FD_ZERO(&rfds);
            FD_SET(modem_in_fd, &rfds);
            FD_SET(dev_dsp_fd, &rfds);

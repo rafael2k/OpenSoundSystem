@@ -1,0 +1,150 @@
+oss4 (4.2-build2020-10) unstable; urgency=medium
+
+  * This fork adds working audio support for the Lenovo ThinkPad P70
+    (Intel SPT/KBL-LP HDA controller 8086:9d71 + Realtek ALC298 codec)
+  * oss_hdaudio: support modern Intel HDA controllers (SKL/KBL/CNL/CML/
+    ICL/TGL/ADL/RPL/APL/GML + earlier HSW/BDW/BYT/BSW) and Realtek ALC298
+  * Fix DMA under IOMMU (dma_alloc_attrs with va->dma table, table-driven
+    free for vmix subdevices), codec vendor probe, RIRB state reset
+  * Verified working on Debian 13 kernel 6.12.101 (ALC298 on ThinkPad,
+    audio plays via /dev/dsp)
+
+ -- Rafael Diniz <rafael@riseup.net>  Sat, 08 Aug 2026 02:05:00 +0000
+
+oss4 (4.2-build2020-9) unstable; urgency=medium
+
+  * Rebase Debian packaging on deb-multimedia (Christian Marillat) oss4-dmo:
+    restore oss4-base, oss4-gtk, oss4-dkms, oss4-source, oss4-dev packages
+    with kernel driver build (dkms) and modern-kernel patch set applied
+    in-tree (mregparm guard, linux/io, proc_ops, time_t, kernel includes,
+    module symbols for >= 6.2).
+  * oss4-dkms: enable oss_usb driver (USB audio, required for radio
+    sound card use); exclude lynxtwo from the dkms tree.
+  * liboss4-salsa-dev: enable on Linux (linux-any).
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 14:00:00 +0000
+
+oss4 (4.2-build2020-8) unstable; urgency=medium
+
+  * liboss4-salsa-dev: Enable on Linux (linux-any). The package conflicts
+    with libasound2-dev by design; install only on OSS-exclusive systems.
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 13:00:00 +0000
+
+oss4 (4.2-build2020-7) unstable; urgency=medium
+
+  * Fork update: apply Debian libsalsa patch set directly in-tree and
+    remove debian/patches (quilt series no longer used).
+  * Include Arch Linux AUR kernel-compat fixes (osscore, ossvermagic,
+    extramodules, soundon, rm-init-scripts, remove-hal).
+
+ -- Rafael Diniz <rafael@riseup.net>  Fri, 07 Aug 2026 12:00:00 +0000
+  * patches/101_use_env_CFLAGS.patch: Fix taking CPPFLAGS and LDFLAGS into
+    account.
+  * Update standards version to 4.6.2, no changes needed.
+  * rules: Simplify and rewrite to use debhelper instead of cdbs
+    (Closes: Bug#1111846)
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 22 Aug 2025 22:57:18 +0200
+
+oss4 (4.2-build2020-5) unstable; urgency=medium
+
+  * liboss4-salsa-dev.install: Fix multiarch patch.
+  * Drop oss4-base, oss4-gtk, oss4-dkms, oss4-source, oss4-dev packages and
+    the kernel driver build infrastructure and patches (Closes: Bug#796636,
+    Bug#1101743)
+  * salsa-ci.yml: Add hurd CI.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 09 Mar 2025 22:05:03 +0100
+
+oss4 (4.2-build2020-4) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * oss4-dev.postrm: Drop purge case, remove will have already called it. Add
+    abort-install case.
+  * debian/oss4-dev.install: Do not install soundcard.h (Closes: Bug#1099702)
+
+  [ Andreas Beckmann ]
+  * Declare Testsuite: autopkgtest-pkg-dkms.
+  * Exclude the unused oss_usb module which fails to build for kernels without
+    CONFIG_USB, e.g. the -cloud- flavors.
+  * dkms.conf: Declare BUILD_EXCLUSIVE_KERNEL_MIN="5.15" for using
+    linux/stdarg.h.
+
+ -- Samuel Thibault <sthibault@debian.org>  Fri, 07 Mar 2025 00:03:41 +0100
+
+oss4 (4.2-build2020-3) unstable; urgency=medium
+
+  * patches/implicit: Fix build with qa=+bug-implicit-func.
+
+ -- Samuel Thibault <sthibault@debian.org>  Wed, 13 Mar 2024 20:00:09 +0100
+
+oss4 (4.2-build2020-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Update libasound2 provides for 64-bit time_t transition
+    (Closes: Bug#1064301).
+  * Use explicit Provides: for libasound2 compat on 64-bit archs since
+    debhelper won't be able to work this out given 't64' is not in the
+    package name.
+
+ -- Steve Langasek <vorlon@debian.org>  Mon, 19 Feb 2024 19:59:19 +0000
+
+oss4 (4.2-build2020-2) unstable; urgency=medium
+
+  * control: Drop dependency on now-obsolete lsb-base.
+  * patches/nogtk2: Drop ossxmix.
+  * control: Drop gtk2 build-deps (Closes: #967677).
+
+ -- Samuel Thibault <sthibault@debian.org>  Sat, 05 Aug 2023 02:12:47 +0200
+
+oss4 (4.2-build2020-1) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * New upstream release.
+    - patches/003_linux-error-logging-fixes.patch: Refresh.
+    - patches/201_arch_without_mregparm.patch: Refresh.
+    - patches/202_fix_invalid_printf.patch: Refresh.
+    - patches/402_os_cmd.patch: Refresh.
+    - patches/503_glibc_2.28.patch: Partly upstreamed.
+    - Closes: #919246.
+    - patches/include.patch: Fix including headers.
+    - patches/fixes.patch: Various fixes.
+  * control: Bump Standards-Version to 4.6.0 (no change)
+  * oss4-dkms.dkms.in: Fix using M= instead of SUBDIRS=.
+  * create-ma-tree.sh: Add -Wno-error.
+  * create-ma-tree.sh: Fix including core's Module.symvers.
+  * create-ma-tree.sh: Blacklist lynxtwo driver.
+  * create-ma-tree.sh: Fix including headers.
+  * create-ma-tree.sh: Fix endianness macros.
+  * control: Build-dep on dh-dkms instead of dkms (Closes: #1027888).
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + Build-Depends: Drop versioned constraint on tar.
+
+ -- Samuel Thibault <sthibault@debian.org>  Sun, 08 Jan 2023 20:31:03 +0100
+
+oss4 (4.2-build2017-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * control: Fix VCS URLs.
+  * rules: Rely on pre-initialized dpkg-architecture variables.
+  * control: Bump Standards-Version to 4.5.0 (no change).
+  * control: Silent lintian warning about weak dependency version.
+  * control: make oss4-base depend on lsb-base for sourcing
+    /lib/lsb/init-functions.
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Remove maintainer from uploaders.
+  * Bump debhelper from deprecated 9 to 10.
+  * Use canonical URL in Vcs-Browser, Vcs-Git.
+
+  [ Thadeu Lima de Souza Cascardo ]
+  * Fix build on ppc64el with binutils 2.35 (Closes: #968413).
+
+ -- Samuel Thibault <sthibault@debian.org>  Thu, 31 Dec 2020 11:00:14 +0100
+
+# Older entries have been removed from this changelog.
+# To read the complete changelog use `apt changelog oss4-source`.

@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/kernel/framework/midi_stubs/oss_midi_stubs.c

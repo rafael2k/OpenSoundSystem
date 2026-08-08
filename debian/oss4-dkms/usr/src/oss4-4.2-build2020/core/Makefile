@@ -1,0 +1,27 @@
+MULTIARCH_PATH = /usr/include/$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+EXTRA_CFLAGS = -I$(KBUILD_EXTMOD) -isystem /usr/include -isystem $(MULTIARCH_PATH) 	-isystem $(shell $(CC) --print-file-name=include-fixed)
+obj-m += osscore.o
+osscore-objs := oss_core.o os_linux.o oss_ac97.o oss_audio_core.o oss_audiofmt.o oss_grc3.o oss_spdif.o oss_default_timer.o oss_midi_core.o oss_midi_mapper.o oss_midi_parser.o oss_midi_queue.o oss_midi_timers.o oss_midi_stubs.o oss_mixer_core.o oss_core_options.o oss_core_services.o oss_memblk.o oss_remux.o oss_sndstat.o oss_uart401.o vmix_core.o vmix_input.o vmix_output.o
+CFLAGS_os_linux.o = -D_KERNEL
+CFLAGS_oss_ac97.o = -D_KERNEL
+CFLAGS_oss_audio_core.o = -D_KERNEL
+CFLAGS_oss_audiofmt.o = -D_KERNEL
+CFLAGS_oss_grc3.o = -D_KERNEL
+CFLAGS_oss_spdif.o = -D_KERNEL
+CFLAGS_oss_default_timer.o = -D_KERNEL
+CFLAGS_oss_midi_core.o = -D_KERNEL
+CFLAGS_oss_midi_mapper.o = -D_KERNEL
+CFLAGS_oss_midi_parser.o = -D_KERNEL
+CFLAGS_oss_midi_queue.o = -D_KERNEL
+CFLAGS_oss_midi_timers.o = -D_KERNEL
+CFLAGS_oss_midi_stubs.o = -D_KERNEL
+CFLAGS_oss_mixer_core.o = -D_KERNEL
+CFLAGS_oss_core_options.o = -D_KERNEL
+CFLAGS_oss_core_services.o = -D_KERNEL
+CFLAGS_oss_memblk.o = -D_KERNEL
+CFLAGS_oss_remux.o = -D_KERNEL
+CFLAGS_oss_sndstat.o = -D_KERNEL
+CFLAGS_oss_uart401.o = -D_KERNEL
+CFLAGS_vmix_core.o = -D_KERNEL
+CFLAGS_vmix_input.o = -D_KERNEL
+CFLAGS_vmix_output.o = -D_KERNEL

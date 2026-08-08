@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/setup/FreeBSD/oss/build/bsdpci.inc

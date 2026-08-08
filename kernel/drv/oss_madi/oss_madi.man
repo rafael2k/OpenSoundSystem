@@ -64,7 +64,7 @@ o Use of mmap() is and will not be supported.
 o Virtual mixer is not supported (yet).
 
 FILES
-CONFIGFILEPATH/oss_madi.conf Device configuration file.
+CONFIGFILEPATH/oss_madi.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

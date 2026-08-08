@@ -3,12 +3,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/wait.h>
 #include <string.h>
 #include "alsa-symbols.h"
 #include <alsa/asoundlib.h>
 #include "../../include/soundcard.h"
 #include "alsakernel.h"
 #include <sys/poll.h>
+#include <sys/ioctl.h>
 #include "../../kernel/framework/include/midiparser.h"
 
 extern int alib_verbose;
@@ -26,7 +29,7 @@ extern oss_sysinfo sysinfo;
 
 extern int alib_initialized;
 
-extern int init_alib (void);
+extern int alib_init (void);
 
 #define ALIB_INIT() \
 { \
@@ -96,3 +99,12 @@ extern int convert_event (snd_seq_t * seq, snd_seq_event_t * ev);
 extern void midiparser_callback (void *context, int category,
 				 unsigned char msg, unsigned char ch,
 				 unsigned char *parms, int len);
+
+#define _IOT__IOTBASE_oss_longname_t _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_audio_buf_info _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_sysinfo _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_mixext _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_mixer_value _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_audioinfo _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_mixerinfo _IOT (0, 0, 0, 0, 0, 0)
+#define _IOT__IOTBASE_oss_card_info _IOT (0, 0, 0, 0, 0, 0)

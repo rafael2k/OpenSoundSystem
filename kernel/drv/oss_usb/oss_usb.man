@@ -50,7 +50,7 @@ OPTIONS
 None
 
 FILES
-CONFIGFILEPATH/oss_usb.conf Device configuration file
+CONFIGFILEPATH/oss_usb.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

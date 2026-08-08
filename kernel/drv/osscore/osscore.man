@@ -1,9 +1,9 @@
 NAME
-osscore - Open Sound Sytem core audio framework.
+osscore - Open Sound System core audio framework.
 
 DESCRIPTION
 Open Sound System core audio support psudo driver. This driver implements the core Open Sound System API for audio, midi, mixer and synth functions. This driver also implements the OS driver interface as well as device configuration and setup. 
-More information on programming on the OSS API is avaialable at:
+More information on programming on the OSS API is available at:
 http://manuals.opensound.com/
 
 OPTIONS
@@ -80,7 +80,7 @@ o mixer_muted	By default OSS will set most volume controls to audible level.
 		Values: 0 (default) - Use audible volumes, 1 - Set volumes to low.
 
 FILES
-CONFIGFILEPATH/osscore.conf Device configuration file
+CONFIGFILEPATH/osscore.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

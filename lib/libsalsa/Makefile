@@ -2,7 +2,8 @@ LOBJECTS=main.lo output.lo misc.lo pcm.lo mix.lo seq.lo seqmid.lo rawmidi.lo seq
 
 OSSLIBDIR=/usr/lib/oss
 
-CFLAGS=-O -I../../include -I../libOSSlib
+CFLAGS+=-I../../include -I../libOSSlib
+CFLAGS+=$(CPPFLAGS)
 LIBTOOL=libtool --tag=CC
 
 all: libsalsa.la
@@ -46,7 +47,7 @@ rawmidi.lo:	rawmidi.c
 		$(LIBTOOL) --mode=compile ${CC} $(CFLAGS) -c rawmidi.c 
 
 libsalsa.la:   $(LOBJECTS)
-		$(LIBTOOL) --mode=link ${CC} -rpath /usr/lib -Wl,--version-script=Versions -version-info 2:0:0 -o libsalsa.la $(LOBJECTS) -L../libOSSlib -lOSSlib
+		$(LIBTOOL) --mode=link ${CC} $(LDFLAGS) -rpath /usr/lib -R /usr/lib/$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)/oss4-libsalsa -Wl,--version-script=Versions -version-info 2:0:0 -o liboss4-salsa.la $(LOBJECTS) -L../libOSSlib -lOSSlib
 
 install:	libsalsa.la
 		$(LIBTOOL) cp libsalsa.la /usr/lib

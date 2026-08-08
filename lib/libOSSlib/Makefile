@@ -1,7 +1,8 @@
 OBJS=libmain.o midiparser.o play_event.o
 INSTALLLIB=/lib
-LDFLAGS=-shared -fPIC
-CFLAGS=-O -fPIC
+LDFLAGS+=-shared -fPIC
+CFLAGS+=-fPIC
+CFLAGS+=$(CPPFLAGS)
 #LDFLAGS=-Bdynamic
 AROPTS=rc
 AR=ar

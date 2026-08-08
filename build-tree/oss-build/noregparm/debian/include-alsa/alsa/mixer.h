@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/debian/include-alsa/alsa/mixer.h

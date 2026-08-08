@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/tutorials/sndkit/dsp/str/str.c

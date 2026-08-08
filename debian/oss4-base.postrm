@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e 
+
+
+if [ "$1" = "purge" ] ; then
+      if [ -d /etc/oss4 ]; then
+         rm -rf /etc/oss4
+      fi
+      if [ -d /var/lib/oss4 ]; then
+         rm -rf /etc/oss4
+      fi
+fi
+
+#DEBHELPER#
+
+exit 0

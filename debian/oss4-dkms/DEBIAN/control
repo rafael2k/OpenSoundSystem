@@ -1,0 +1,15 @@
+Package: oss4-dkms
+Source: oss4
+Version: 4.2-build2020-10
+Architecture: amd64
+Maintainer: Rafael Diniz <rafael@riseup.net>
+Installed-Size: 5406
+Depends: dkms (>= 2.1.0.0), oss4-base, libc6-dev
+Recommends: linux-headers-686-pae | linux-headers-amd64 | linux-headers-generic
+Provides: oss4-modules
+Section: kernel
+Priority: optional
+Homepage: http://www.4front-tech.com/
+Description: Open Sound System - DKMS module sources
+ This package contains the source for the OSS4 kernel modules, packaged with
+ appropriate configuration for DKMS to build new modules dynamically.

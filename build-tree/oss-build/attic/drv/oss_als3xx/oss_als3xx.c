@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/attic/drv/oss_als3xx/oss_als3xx.c

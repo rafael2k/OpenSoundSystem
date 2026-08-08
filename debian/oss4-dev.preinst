@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+
+case "$1" in
+    install)
+	# Diverting old soundcard.h
+        dpkg-divert --package oss4-dev --divert \
+            /usr/include/linux/soundcard.h.oss3  \
+            --rename /usr/include/linux/soundcard.h
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

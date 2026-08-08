@@ -16,7 +16,7 @@ Set the IRQ for the UART401 MPU. Refer to device conf file (see below) for
 valid IRQs.
 
 FILES
-CONFIGFILEPATH/oss_fmedia.conf Device configuration file
+CONFIGFILEPATH/oss_fmedia.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

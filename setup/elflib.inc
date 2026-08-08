@@ -2,7 +2,17 @@
  * These routines are used to change the contects of various structures
  * stored inside the modules
  */
-#define COPYING3 Copyright (C) Hannu Savolainen and Dev Mazumdar 1996-2005. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #if !defined(ELF64) && !defined(ELF32)
 #  if defined(sparc) || defined(__x86_64__)
@@ -71,7 +81,11 @@ valid_elf_file (Elf_Ehdr * hdr)
     }
   if (hdr->e_ehsize != sizeof (*hdr))
     {
-      fprintf (stderr, "e_ehsize=%x (%x)\n", hdr->e_ehsize, sizeof (*hdr));
+      #if defined(__alpha__) || defined(__s390__) || defined(__ia64__)
+        fprintf (stderr, "e_ehsize=%x (%lx)\n", hdr->e_ehsize, sizeof (*hdr));
+      #else
+        fprintf (stderr, "e_ehsize=%x (%x)\n", hdr->e_ehsize, sizeof (*hdr));
+      #endif
       return 0;
     }
 

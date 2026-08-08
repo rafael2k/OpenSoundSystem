@@ -2,7 +2,17 @@
  * Purpose: OSS device autodetection utility for Linux
  *
  */
-#define COPYING Copyright (C) Hannu Savolainen and Dev Mazumdar 2006. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -12,6 +22,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include <grp.h>
 #include <sys/dir.h>
 
 #define PCI_PASS	0
@@ -21,6 +33,7 @@
 
 #define OSSLIBDIRLEN 512
 static char *osslibdir = NULL;
+static char groupname[64] = "root";
 
 static int usb_ok = 0;
 
@@ -544,6 +557,13 @@ create_devlinks (mode_t node_m)
 	printf ("mknod %s c %d %d -m %o\n", dev, major, minor, node_m);
       if (mknod (dev, node_m, makedev (major, minor)) == -1)
 	perror (dev);
+      if (groupname[0] != 0)
+	{
+	  struct group *gr = getgrnam (groupname);
+
+	  if (gr != NULL)
+	    chown (dev, -1, gr->gr_gid);
+	}
     }
 
   umask (perm);
@@ -576,11 +596,15 @@ main (int argc, char *argv[])
   struct stat st;
   FILE *f;
 
-  while ((i = getopt(argc, argv, "L:a:dilm:uv")) != EOF)
+  while ((i = getopt(argc, argv, "L:a:dilm:uvg:")) != EOF)
     switch (i)
       {
 	case 'v':
 	  verbose++;
+	  break;
+
+	case 'g':
+	  strncpy (groupname, optarg, sizeof (groupname) - 1);
 	  break;
 
 	case 'd':

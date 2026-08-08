@@ -71,7 +71,7 @@ Values: 2-48 Default: 5
 
 
 FILES
-CONFIGFILEPATH/oss_imux.conf Device configuration file
+CONFIGFILEPATH/oss_imux.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

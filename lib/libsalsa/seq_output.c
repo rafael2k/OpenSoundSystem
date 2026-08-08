@@ -40,7 +40,13 @@ midi_out3 (snd_seq_t * seq, int msg, int parm1, int parm2)
       if (l == -1)
 	return -errno;
 
+#ifdef EBADE
       return -EBADE;		/* Randomly selected error */
+#elif defined(EGRATUITOUS)
+      return -EGRATUITOUS;	/* Randomly selected error */
+#else
+      return -EIO;		/* Randomly selected error */
+#endif
     }
 
   return 0;
@@ -65,7 +71,13 @@ midi_out2 (snd_seq_t * seq, int msg, int parm1)
       if (l == -1)
 	return -errno;
 
+#ifdef EBADE
       return -EBADE;		/* Randomly selected error */
+#elif defined(EGRATUITOUS)
+      return -EGRATUITOUS;	/* Randomly selected error */
+#else
+      return -EIO;		/* Randomly selected error */
+#endif
     }
 
   return 0;
@@ -78,7 +90,7 @@ convert_event (snd_seq_t * seq, snd_seq_event_t * ev)
 
   dbg_printf3
     ("Event %2d: flags=%08x tag=%08x, q=%2d, time=%d, src=%x, dst=%x\n",
-     ev->type, ev->flags, ev->tag, ev->queue, ev->time, ev->source, ev->dest);
+     ev->type, ev->flags, ev->tag, ev->queue, ev->time.tick, ev->source, ev->dest);
 
   switch (ev->type)
     {

@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/tutorials/sndkit/softsynth/softsynth_gtk.c

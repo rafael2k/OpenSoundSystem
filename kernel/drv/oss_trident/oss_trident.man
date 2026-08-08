@@ -21,7 +21,7 @@ will not work under Sparc. The only exception is the ALI5451 chip that is
 used on the main boards on many Sparc based systems.
 
 FILES
-CONFIGFILEPATH/oss_trident.conf Device configuration file
+CONFIGFILEPATH/oss_trident.conf  Device configuration file.
 
 AUTHOR
 4Front Technologies

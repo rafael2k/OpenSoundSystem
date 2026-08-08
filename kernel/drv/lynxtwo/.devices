@@ -1,0 +1,8 @@
+lynxtwo	pci1621,20	LynxTWO-A Studio Interface
+lynxtwo	pci1621,21	LynxTWO-B Studio Interface
+lynxtwo	pci1621,22	LynxTWO-C Studio Interface
+lynxtwo	pci1621,23	Lynx-L22 Studio Interface
+lynxtwo	pci1621,24	Lynx AES16 Studio Interface
+lynxtwo	pci1621,25	Lynx AES16-SRC Studio Interface
+lynxtwo	pci1621,28	Lynx AES16e Studio Interface 
+lynxtwo	pci1621,29	Lynx AES16e-SRC Studio Interface 

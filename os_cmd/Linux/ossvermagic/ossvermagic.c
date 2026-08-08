@@ -1,4 +1,14 @@
-#define COPYING Copyright (C) Hannu Savolainen and Dev Mazumdar 2006. All rights reserved.
+/*
+ *
+ * This file is part of Open Sound System.
+ *
+ * Copyright (C) 4Front Technologies 1996-2008.
+ *
+ * This this source file is released under GPL v2 license (no other versions).
+ * See the COPYING file included in the main directory of this source
+ * distribution for the license terms and conditions.
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,6 +80,8 @@ find_vermagic (char *fname)
   ok = ELF_LOAD_SYMTAB (fname, "vermagic", sym_callback);
   if (!ok)
     ok = ELF_LOAD_SYMTAB (fname, "__mod_vermagic", sym_callback);
+  if (!ok)
+    ok = ELF_LOAD_SYMTAB (fname, "__UNIQUE_ID_vermagic0", sym_callback);
   if (!ok)
     ELF_LOAD_SYMTAB (fname, "__oss_compile_vermagic", sym_callback);
 }

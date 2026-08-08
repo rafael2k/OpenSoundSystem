@@ -1,0 +1,1 @@
+/home/rafael2k/programs/devel/OpenSoundSystem/attic/drv/oss_digi32/oss_digi32.c

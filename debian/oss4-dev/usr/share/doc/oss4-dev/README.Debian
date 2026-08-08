@@ -1,0 +1,17 @@
+OSS 4 for Debian
+----------------
+
+The OSS 4.0 API is backward compatible with applications developed
+for previous API versions. Since OSS is based on the Posix/Unix
+system call interface, there is no library code that could cause
+dependency problems with different library versions.
+
+This makes it possible to get 10 years old programs to work with
+the latest OSS version without recompiling (provided that the program
+doesn't depend on undocumented features).
+
+Equally it's possible to use an application compiled against
+the very latest OSS header in a system that runs some 10 years old driver.
+This is of course only possible if that application doesn't use
+the new ioctl calls.
+

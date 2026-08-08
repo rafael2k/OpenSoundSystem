@@ -64,7 +64,7 @@ OPTIONS
 COMMAND SCRIPT
 		The -r command line argument makes it possible to execute a
 		script or program after recording of the wave file is finished.
-		Below is a simple scell script that does MP3 encoding using
+		Below is a simple shell script that does MP3 encoding using
 		lame.
 
 #!/bin/sh
