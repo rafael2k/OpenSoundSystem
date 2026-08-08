@@ -1,5 +1,7 @@
 oss4 (4.2-build2020-10) unstable; urgency=medium
 
+  * This fork adds working audio support for the Lenovo ThinkPad P70
+    (Intel SPT/KBL-LP HDA controller 8086:9d71 + Realtek ALC298 codec)
   * oss_hdaudio: support modern Intel HDA controllers (SKL/KBL/CNL/CML/
     ICL/TGL/ADL/RPL/APL/GML + earlier HSW/BDW/BYT/BSW) and Realtek ALC298
   * Fix DMA under IOMMU (dma_alloc_attrs with va->dma table, table-driven
