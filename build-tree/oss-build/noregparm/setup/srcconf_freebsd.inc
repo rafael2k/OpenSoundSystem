@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/setup/srcconf_freebsd.inc

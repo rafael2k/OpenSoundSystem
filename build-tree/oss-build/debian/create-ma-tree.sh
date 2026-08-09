@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/debian/create-ma-tree.sh

@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/os_cmd/SCO_SV/ossdetect/ossdetect.c

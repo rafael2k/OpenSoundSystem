@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/setup/Linux/oss/cuckoo/cuckoo_mixer.c

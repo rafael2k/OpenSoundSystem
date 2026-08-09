@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_via97/oss_via97.c

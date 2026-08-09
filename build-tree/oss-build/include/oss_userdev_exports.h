@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/include/oss_userdev_exports.h
