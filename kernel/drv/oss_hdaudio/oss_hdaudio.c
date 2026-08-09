@@ -1995,6 +1995,19 @@ oss_hdaudio_attach (oss_device_t * osdev)
   if ((err = oss_register_interrupts (devc->osdev, 0, hdaintr, NULL)) < 0)
     {
       cmn_err (CE_WARN, "Can't register interrupt handler, err=%d\n", err);
+
+      MUTEX_CLEANUP (devc->mutex);
+      MUTEX_CLEANUP (devc->low_mutex);
+
+      if (devc->membar_addr != 0)
+	{
+	  UNMAP_PCI_MEM (devc->osdev, 0, devc->membar_addr, devc->azbar,
+			 16 * 1024);
+	  devc->membar_addr = 0;
+	}
+
+      oss_unregister_device (devc->osdev);
+      already_attached = 0;
       return 0;
     }
 
