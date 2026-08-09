@@ -1,0 +1,158 @@
+oss_hdaudio: Lenovo ThinkPad P70 support
+=========================================
+
+This describes the changes made to bring up working audio on a Lenovo
+ThinkPad P70 (Intel HD Audio controller + Realtek ALC298 codec) under a
+modern Linux kernel (verified on Debian 13, kernel 6.12.101), and what
+was found/fixed along the way. None of this is P70-specific in a way
+that limits it to that one laptop -- the controller ID table and DMA
+fixes benefit any reasonably modern Intel HDA platform, and the codec
+ID is shared by many other Realtek ALC298 designs.
+
+Hardware verified against
+--------------------------
+
+  Controller: Intel Corporation 100 Series/C230 Series Chipset Family
+              HD Audio Controller, PCI ID 8086:a170 (lspci calls this
+              "SKL" in this driver's naming; the exact stepping/ID can
+              vary between P70 units and BIOS versions)
+  Codec:      Realtek ALC298 (ALC269 family), HDA vendor ID 0x10ec0298
+
+What was broken
+----------------
+
+Out of the box, the upstream oss_hdaudio driver did not detect this
+controller/codec combination at all, and even once the PCI ID and
+codec ID were added, the driver crashed or produced silence for a
+number of reasons specific to modern kernels/hardware:
+
+  * The controller's PCI device ID (and those of most Intel chipsets
+    from Haswell/Broadwell through Alder Lake/Raptor Lake) were simply
+    absent from the driver's ID tables (devlists/Linux,
+    kernel/drv/oss_hdaudio/.devices, oss_hdaudio.c's attach switch).
+
+  * The Realtek ALC298 codec ID, and its ThinkPad-specific widget
+    layout (pin/widget naming for the internal mic, internal speaker,
+    and headphone jack), were missing from the codec table.
+
+  * DMA allocation used __get_free_pages()/virt_to_phys(), which does
+    not produce addresses valid for a device behind an IOMMU. On an
+    IOMMU-enabled system this caused DMAR faults as soon as the
+    controller's CORB/RIRB command/response buffers were touched.
+
+  * ALSA's snd_hda_intel (if it had probed the card earlier, e.g. via
+    an earlier boot or a coexisting kernel module) can leave the codec
+    powered down in D3. In that state the codec answers every verb
+    with 0x00000000, including the vendor-ID read used to identify it,
+    so the codec looked "unknown" even though the ID table was correct.
+
+  * vmix allocates its virtual sub-device DMA buffers through the
+    parent PCI device's DMA-API path but previously freed them through
+    a different, NULL-osdev fallback path meant for non-PCI (page
+    based) buffers, causing a crash (page fault) on close.
+
+  * Verbose RIRB/codec-setup tracing was unconditionally printed to
+    dmesg on every attach.
+
+What changed (see git log for exact commits)
+---------------------------------------------
+
+  * Intel controller IDs added: HSW, BDW, BYT, BSW, SKL(+LP), SPT(+LP),
+    KBL(+H), CNL(+LP/H), CML(+LP/H/S), ICL(+LP/N/H), TGL(+LP/H),
+    ADL(+P/PX/M/N/S), RPL-S, APL, GML -- kernel/drv/oss_hdaudio/.devices,
+    devlists/Linux, and the attach switch in oss_hdaudio.c.
+
+  * Realtek ALC298 added to the codec table with ThinkPad-style widget
+    remap names -- kernel/drv/oss_hdaudio/hdaudio_codecids.h.
+
+  * New DMA helpers in kernel/OS/Linux/os_linux.c: oss_dma_alloc(),
+    oss_dma_free(), oss_dma_capable(), oss_dma_has(). These use
+    dma_alloc_attrs()/dma_free_attrs() and keep a va->dma mapping table
+    (raised to 128 entries) so a buffer can be freed correctly
+    regardless of which osdev pointer (or NULL, for vmix) is passed to
+    free -- osscore now looks the buffer up in the table instead of
+    trusting the caller's osdev.
+
+  * attach_codec() now sends SET_CODEC_RESET and re-powers the codec
+    after the controller reset, waits the HDA-spec-mandated 250 ms, and
+    retries+rejects an all-zero vendor-ID read instead of accepting it
+    as a valid (if unrecognized) codec.
+
+  * RIRB entry trace, controller state dump and vendor-probe tracing
+    are kept in the source under #if 0 for future debugging, but no
+    longer spam dmesg on every attach.
+
+  * Legacy OSS 3.6 mixer compatibility (SOUND_MIXER_* ioctls, used by
+    e.g. rexima) -- see below.
+
+Legacy OSS 3.6 mixer compatibility
+------------------------------------
+
+Historically, oss_hdaudio's hda_mixer_ioctl() unconditionally reported
+an empty legacy device mask, so any application using the old OSS 3.6
+SOUND_MIXER_* ioctl API (rexima being the canonical example -- it does
+not speak the modern mixer_ext/SNDCTL_MIX_* API at all) saw "mixer has
+no devices", even though the card works fine through ossmix/ossxmix.
+
+HDA codec topology (which widgets exist, how they're named) varies too
+much across machines to hardcode a fixed legacy control set the way
+e.g. oss_envy24 does for its fixed hardware. Instead, hda_mixer_ioctl()
+now locates a small set of legacy slots dynamically, by pattern-matching
+this specific mixer device's own already-created mixer_ext controls:
+
+  SOUND_MIXER_VOLUME, SOUND_MIXER_PCM  -> the "vmix<N>-outvol" control
+                                          (master output level; vmix's
+                                          instance number is looked up
+                                          rather than assumed to be 0,
+                                          so this also works if this
+                                          isn't the first sound card)
+  SOUND_MIXER_MIC                      -> "misc.mic" if present, else
+                                          "jack.int-mic"
+
+DEVMASK/RECMASK/RECSRC/STEREODEVS are computed from what's *actually*
+found on this card, not a fixed assumption -- if a given machine's ALC298
+(or a different codec entirely) doesn't expose a control matching one of
+the patterns above, that slot is simply absent from the mask rather than
+present-but-broken. Values are read/written through the control's own
+mixer_ext handler function (the same one ossmix/ossxmix use), converted
+between its native 0..maxvalue range and the legacy 0-100 range -- not
+via a separate, possibly-inconsistent code path.
+
+Known limitations
+--------------------
+
+  * Only VOLUME/PCM (mapped together, to the single master output
+    level) and MIC are implemented. Legacy apps that expect independent
+    LINE, CD, or per-jack controls won't find them -- HDA's per-jack,
+    per-path mixer model doesn't map cleanly onto OSS 3.6's fixed
+    25-slot model, and 4Front's original driver never attempted this
+    mapping at all (hda_mixer_ioctl() always returned an empty mask
+    upstream). The mapping here is intentionally conservative rather
+    than guessing at additional slots.
+
+  * mmap() on /dev/dsp* will fail with "mmap() not possible with
+    currently selected sample format" whenever the stream is in
+    "cooked" mode (format/rate conversion, which is essentially always
+    the case once vmix or PulseAudio's software mixing is involved).
+    This is generic OSS4 core behavior (kernel/OS/Linux/os_linux.c and
+    kernel/OS/FreeBSD/os_freebsd.c both have the identical check), not
+    specific to this driver -- mmap requires direct zero-copy access to
+    the hardware buffer, which is incompatible with a software
+    conversion step in between.
+
+Building/installing
+----------------------
+
+The standalone `./configure && make` build never compiles Linux kernel
+drivers correctly on modern kernels (it doesn't use real kbuild and
+never points at real kernel headers -- see debian/create-ma-tree.sh for
+the build path that does work). To build and install this driver:
+
+  bash ./debian/create-ma-tree.sh build-tree/modules/oss4 build-tree/oss-build
+  # (after the usual ./configure + `make build` step in build-tree/oss-build,
+  #  see debian/rules for the exact sequence)
+
+or, for a normal end-user install, via the Debian package's DKMS
+integration (`dpkg -i oss4-dkms_*.deb`, or `dkms build`/`dkms install`
+against an existing /usr/src/oss4-<version>/ tree) -- this is what
+actually builds and signs the modules that get loaded at boot.
