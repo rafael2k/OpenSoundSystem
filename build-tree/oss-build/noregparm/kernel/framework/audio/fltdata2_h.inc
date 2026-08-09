@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/framework/audio/fltdata2_h.inc

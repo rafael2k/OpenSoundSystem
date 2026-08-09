@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_envy24/oss_envy24.c

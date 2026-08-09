@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/tutorials/sndkit/tests/spdif_in_debug.c

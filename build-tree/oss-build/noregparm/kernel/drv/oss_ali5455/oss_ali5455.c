@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_ali5455/oss_ali5455.c

@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_hdaudio/hdaudio_asus_P4B_E.c

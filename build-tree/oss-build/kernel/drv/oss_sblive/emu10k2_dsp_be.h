@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/kernel/drv/oss_sblive/emu10k2_dsp_be.h

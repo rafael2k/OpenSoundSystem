@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/setup/gen_driver_freebsd.inc

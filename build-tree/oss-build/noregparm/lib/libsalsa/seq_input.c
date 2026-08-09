@@ -1,1 +1,0 @@
-/home/rafael2k/programs/devel/OpenSoundSystem/lib/libsalsa/seq_input.c
