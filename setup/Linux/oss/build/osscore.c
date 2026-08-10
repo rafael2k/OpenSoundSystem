@@ -651,11 +651,7 @@ oss_uiomove (void *addr, size_t nbytes, enum uio_rw rwflag, uio_t * uio)
   switch (rwflag)
     {
     case UIO_READ:
-      c = nbytes;
-      if (c > 10)
-	c = 0;
-
-      if ((c = copy_to_user (uio->ptr, address, nbytes) != 0))
+      if ((c = copy_to_user (uio->ptr, address, nbytes)) != 0)
 	{
 	  uio->resid -= nbytes;
 	  oss_cmn_err (CE_CONT, "copy_to_user(%d) failed (%d)\n", nbytes, c);
