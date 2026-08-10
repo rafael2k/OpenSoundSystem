@@ -4463,6 +4463,33 @@ oss_audio_read (int dev, struct fileinfo *file, uio_t * buf, int count)
       if (uiomove (dmabuf, l, UIO_READ, buf) != 0)
 	{
 	  cmn_err (CE_WARN, "audio: uiomove(UIO_READ) failed\n");
+	  /*
+	   * Dump the full dmap/uio state at the exact moment copy_to_user()
+	   * fails. A bare EFAULT here is otherwise very hard to diagnose --
+	   * this only fires on the already-rare failure path, so keep it
+	   * rather than treating it as one-off debug output to strip out.
+	   */
+	  cmn_err (CE_WARN,
+		   "audio: EFAULT diag: dev=%d engine=%d comm=%s pid=%d\n",
+		   dev, adev->engine_num, oss_get_procname (), oss_get_pid ());
+	  cmn_err (CE_WARN,
+		   "audio: EFAULT diag: l=%d c=%d p=%d n=%d count=%d dmabuf=%p\n",
+		   l, c, p, n, count, dmabuf);
+	  cmn_err (CE_WARN,
+		   "audio: EFAULT diag: uio->ptr=%p uio->resid=%d uio->rw=%d uio->kernel_space=%d\n",
+		   buf->ptr, buf->resid, buf->rw, buf->kernel_space);
+	  cmn_err (CE_WARN,
+		   "audio: EFAULT diag: COOKED=%d frag_size=%d nfrags=%d bytes_in_use=%d "
+		   "frame_size=%d user_frame_size=%d expand_factor=%d\n",
+		   !!(dmap->flags & DMAP_COOKED), dmap->fragment_size, dmap->nfrags,
+		   dmap->bytes_in_use, dmap->frame_size, dmap->user_frame_size,
+		   dmap->expand_factor);
+	  cmn_err (CE_WARN,
+		   "audio: EFAULT diag: byte_counter=%llu user_counter=%llu "
+		   "tmpbuf_ptr=%d tmpbuf_len=%d\n",
+		   (unsigned long long) dmap->byte_counter,
+		   (unsigned long long) dmap->user_counter,
+		   dmap->tmpbuf_ptr, dmap->tmpbuf_len);
 	  return OSS_EFAULT;
 	}
       if ((ret = move_rdpointer (adev, dmap, l)) < 0)
