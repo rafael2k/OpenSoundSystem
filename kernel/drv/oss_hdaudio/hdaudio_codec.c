@@ -109,15 +109,6 @@ hda_find_ext (int dev, const char *prefix, const char *substr)
 {
   int i, plen = strlen (prefix);
 
-  /*
-   * mixer_devs[dev]->nr_ext/extensions[] are populated lazily on first
-   * touch. The legacy ioctl dispatch (oss_legacy_mixer_ioctl(), which is
-   * how hda_mixer_ioctl() gets called) never triggers this itself, unlike
-   * every mixer_ext-API code path, so on a process's first ioctl nr_ext
-   * would still be 0 without this.
-   */
-  touch_mixer (dev);
-
   for (i = 0; i < mixer_devs[dev]->nr_ext; i++)
     {
       oss_mixext *ext = mixer_find_ext (dev, i);
