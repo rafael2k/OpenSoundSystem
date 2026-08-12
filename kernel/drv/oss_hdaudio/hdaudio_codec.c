@@ -197,6 +197,15 @@ hda_legacy_read_slider (int dev, const char *prefix, const char *substr)
   if ((raw = hda_ext_rw (dev, extnr, SNDCTL_MIX_READ, 0)) < 0)
     return -1;
 
+  /*
+   * MIXT_MONOSLIDER16 controls (e.g. vmix's outvol) return the value
+   * packed as value|(value<<16), matching the low16/high16 convention
+   * their stereo counterparts use for two independent channels. Mask
+   * back down to the actual value before scaling, or any nonzero
+   * reading overflows this percentage math and clamps straight to 100.
+   */
+  raw &= 0xffff;
+
   pct = (raw * 100) / ext->maxvalue;
   if (pct > 100)
     pct = 100;
