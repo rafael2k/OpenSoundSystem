@@ -162,6 +162,66 @@ hda_find_ext (int dev, const char *prefix, const char *substr)
 }
 
 /*
+ * Some HDA controls (e.g. the internal mic jack) are exposed as a
+ * two-level mixer_ext group ("jack" -> "int-mic") with the actual value
+ * on an anonymous child of the inner group, rather than as a single
+ * control with a flat id. ossmix/oss4 join the group names with "." for
+ * display ("jack.int-mic"), but that joined string is never any single
+ * control's own ext->id, so hda_find_ext()'s flat prefix match can never
+ * find these -- walk the hierarchy explicitly instead: find the group
+ * named "group1", find its child group named "group2", then return the
+ * first grandchild that's an actual value control rather than another
+ * group/marker.
+ */
+static int
+hda_find_group_leaf (int dev, const char *group1, const char *group2)
+{
+  int i, j, k, n;
+
+  if (dev >= 0 && dev < HDA_MIXER_DEV_MAX && !hda_touch_mixer_busy[dev])
+    {
+      hda_touch_mixer_busy[dev] = 1;
+      touch_mixer (dev);
+      hda_touch_mixer_busy[dev] = 0;
+    }
+
+  n = mixer_devs[dev]->nr_ext;
+
+  for (i = 0; i < n; i++)
+    {
+      oss_mixext *g1 = mixer_find_ext (dev, i);
+
+      if (g1 == NULL || g1->type != MIXT_GROUP || strcmp (g1->id, group1) != 0)
+	continue;
+
+      for (j = 0; j < n; j++)
+	{
+	  oss_mixext *g2 = mixer_find_ext (dev, j);
+
+	  if (g2 == NULL || g2->parent != i || g2->type != MIXT_GROUP
+	      || strcmp (g2->id, group2) != 0)
+	    continue;
+
+	  for (k = 0; k < n; k++)
+	    {
+	      oss_mixext *leaf = mixer_find_ext (dev, k);
+
+	      if (leaf == NULL || leaf->parent != j)
+		continue;
+
+	      if (leaf->type == MIXT_GROUP || leaf->type == MIXT_MARKER
+		  || leaf->type == MIXT_DEVROOT)
+		continue;
+
+	      return k;
+	    }
+	}
+    }
+
+  return -1;
+}
+
+/*
  * Read/write a mixer_ext control's handler directly, by array index.
  * Bypasses oss_legacy_mixer_ioctl()/MIXER_READ(ctrl) on purpose since
  * that would call back into this very function.
@@ -183,12 +243,12 @@ hda_ext_rw (int dev, int extnr, unsigned int cmd, int value)
  * mono/gang controls, so the same percentage is used for both channels.
  */
 static int
-hda_legacy_read_slider (int dev, const char *prefix, const char *substr)
+hda_legacy_read_slider_ext (int dev, int extnr)
 {
-  int extnr, raw, pct;
+  int raw, pct;
   oss_mixext *ext;
 
-  if ((extnr = hda_find_ext (dev, prefix, substr)) < 0)
+  if (extnr < 0)
     return -1;
 
   if ((ext = mixer_find_ext (dev, extnr)) == NULL || ext->maxvalue <= 0)
@@ -216,13 +276,12 @@ hda_legacy_read_slider (int dev, const char *prefix, const char *substr)
 }
 
 static int
-hda_legacy_write_slider (int dev, const char *prefix, const char *substr,
-			  int value)
+hda_legacy_write_slider_ext (int dev, int extnr, int value)
 {
-  int extnr, raw, pct;
+  int raw, pct;
   oss_mixext *ext;
 
-  if ((extnr = hda_find_ext (dev, prefix, substr)) < 0)
+  if (extnr < 0)
     return -1;
 
   if ((ext = mixer_find_ext (dev, extnr)) == NULL)
@@ -240,6 +299,44 @@ hda_legacy_write_slider (int dev, const char *prefix, const char *substr,
   return pct | (pct << 8);
 }
 
+static int
+hda_legacy_read_slider (int dev, const char *prefix, const char *substr)
+{
+  return hda_legacy_read_slider_ext (dev, hda_find_ext (dev, prefix, substr));
+}
+
+static int
+hda_legacy_write_slider (int dev, const char *prefix, const char *substr,
+			  int value)
+{
+  return hda_legacy_write_slider_ext (dev,
+				      hda_find_ext (dev, prefix, substr),
+				      value);
+}
+
+/*
+ * Locate the mic control, trying the layouts seen on different HDA
+ * codecs: a flat "misc.mic"/"jack.int-mic"-prefixed id, or a two-level
+ * "jack" -> "int-mic" group with the value on an anonymous child --
+ * see hda_find_group_leaf().
+ */
+static int
+hda_find_mic_ext (int dev)
+{
+  int extnr;
+
+  if ((extnr = hda_find_ext (dev, "misc.mic", NULL)) >= 0)
+    return extnr;
+
+  if ((extnr = hda_find_ext (dev, "jack.int-mic", NULL)) >= 0)
+    return extnr;
+
+  if ((extnr = hda_find_group_leaf (dev, "jack", "int-mic")) >= 0)
+    return extnr;
+
+  return hda_find_group_leaf (dev, "misc", "mic");
+}
+
 /*ARGSUSED*/
 static int
 hda_mixer_ioctl (int dev, int audiodev, unsigned int cmd, ioctl_arg arg)
@@ -251,8 +348,7 @@ hda_mixer_ioctl (int dev, int audiodev, unsigned int cmd, ioctl_arg arg)
       mask = 0;
       if (hda_find_ext (dev, "vmix", "-outvol") >= 0)
 	mask |= SOUND_MASK_VOLUME | SOUND_MASK_PCM;
-      if (hda_find_ext (dev, "misc.mic", NULL) >= 0
-	  || hda_find_ext (dev, "jack.int-mic", NULL) >= 0)
+      if (hda_find_mic_ext (dev) >= 0)
 	mask |= SOUND_MASK_MIC;
       return *arg = mask;
     }
@@ -260,8 +356,7 @@ hda_mixer_ioctl (int dev, int audiodev, unsigned int cmd, ioctl_arg arg)
   if (cmd == SOUND_MIXER_READ_RECMASK || cmd == SOUND_MIXER_READ_RECSRC)
     {
       mask = 0;
-      if (hda_find_ext (dev, "misc.mic", NULL) >= 0
-	  || hda_find_ext (dev, "jack.int-mic", NULL) >= 0)
+      if (hda_find_mic_ext (dev) >= 0)
 	mask |= SOUND_MASK_MIC;
       return *arg = mask;
     }
@@ -282,18 +377,15 @@ hda_mixer_ioctl (int dev, int audiodev, unsigned int cmd, ioctl_arg arg)
 
   if (cmd == SOUND_MIXER_READ_MIC)
     {
-      if ((val = hda_legacy_read_slider (dev, "misc.mic", NULL)) < 0)
-	val = hda_legacy_read_slider (dev, "jack.int-mic", NULL);
-      if (val < 0)
+      if ((val = hda_legacy_read_slider_ext (dev, hda_find_mic_ext (dev))) < 0)
 	return OSS_EINVAL;
       return *arg = val;
     }
 
   if (cmd == SOUND_MIXER_WRITE_MIC)
     {
-      if ((val = hda_legacy_write_slider (dev, "misc.mic", NULL, *arg)) < 0)
-	val = hda_legacy_write_slider (dev, "jack.int-mic", NULL, *arg);
-      if (val < 0)
+      if ((val = hda_legacy_write_slider_ext (dev, hda_find_mic_ext (dev),
+					      *arg)) < 0)
 	return OSS_EINVAL;
       return *arg = val;
     }
