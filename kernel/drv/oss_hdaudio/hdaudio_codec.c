@@ -325,6 +325,18 @@ hda_find_mic_ext (int dev)
 {
   int extnr;
 
+  /*
+   * record.rec2-sel is tried first: on ALC298-based laptops the
+   * internal mic is commonly wired to this ADC specifically, per
+   * direct capture-amplitude testing (rec1-sel/rec3-sel read back
+   * silent while rec2-sel picked up real signal). jack.int-mic, tried
+   * further below, is a real, writable control but doesn't affect the
+   * capture path -- most likely a jack-sense or monitor gain rather
+   * than the ADC's own input gain.
+   */
+  if ((extnr = hda_find_group_leaf (dev, "record", "rec2-sel")) >= 0)
+    return extnr;
+
   if ((extnr = hda_find_ext (dev, "misc.mic", NULL)) >= 0)
     return extnr;
 
