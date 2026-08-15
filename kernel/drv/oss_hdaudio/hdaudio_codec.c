@@ -389,15 +389,24 @@ hda_mixer_ioctl (int dev, int audiodev, unsigned int cmd, ioctl_arg arg)
 
   if (cmd == SOUND_MIXER_READ_MIC)
     {
-      if ((val = hda_legacy_read_slider_ext (dev, hda_find_mic_ext (dev))) < 0)
+      /*
+       * The actual gain comes from vmix's own input volume control, not
+       * straight off the ADC found by hda_find_mic_ext(): that control can
+       * be a MIXT_STEREOSLIDER16 needing left|(right<<16) on write, and
+       * hda_legacy_write_slider_ext() only ever writes a single scalar --
+       * on a stereo control that mutes the channel whose bits land in the
+       * half it never sets. vmix's invol is a MIXT_MONOSLIDER16 (same
+       * shape as the vmix-outvol control already used for legacy
+       * VOLUME/PCM above), so it is gang-safe by construction.
+       */
+      if ((val = hda_legacy_read_slider (dev, "vmix", "-invol")) < 0)
 	return OSS_EINVAL;
       return *arg = val;
     }
 
   if (cmd == SOUND_MIXER_WRITE_MIC)
     {
-      if ((val = hda_legacy_write_slider_ext (dev, hda_find_mic_ext (dev),
-					      *arg)) < 0)
+      if ((val = hda_legacy_write_slider (dev, "vmix", "-invol", *arg)) < 0)
 	return OSS_EINVAL;
       return *arg = val;
     }
