@@ -101,7 +101,14 @@
 #define CREATIVE_XFI_HDA	0x0009
 
 #define BDL_SIZE	32
-#define HDA_MAX_ENGINES	8
+/*
+ * GCAP's input/output stream-engine-count fields are 4 bits wide (see
+ * setup_engines()), so a controller can report up to 15 of each. Size for
+ * the full field range rather than an arbitrary smaller number, or engines
+ * a controller actually has get silently dropped (seen in practice: a
+ * 9-output-engine controller capped down to 8 by this being too small).
+ */
+#define HDA_MAX_ENGINES	16
 #define MAX_OUTPUTS 	8
 #define MAX_INPUTS	4
 
