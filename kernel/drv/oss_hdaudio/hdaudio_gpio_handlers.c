@@ -408,6 +408,71 @@ hdaudio_lenovo_alc298_init (int dev, hdaudio_mixer_t * mixer, int cad, int top_g
       }
   }
 
+  /*
+   * DACs 0x02 ("front") and 0x03 ("rear") each have a real, adjustable
+   * output amp (127 steps, offset==numsteps -- the top of the range is
+   * this codec's 0dB/nominal level, so driving it there is not an
+   * out-of-spec boost, just removing an attenuation nobody asked for).
+   * Neither is ever visited by the generic widget walker on this board:
+   * they're only reachable as connections of mixer widgets 0x0c/0x0d
+   * (which themselves have no adjustable gain, mute-only), so
+   * attach_amplifiers() never runs on 0x02/0x03 and they're left at
+   * whatever the codec/BIOS defaults to -- measured at ~80% of max on
+   * this hardware, i.e. speaker and headphone output are already a few
+   * dB down before any software volume control even applies. 0x02 feeds
+   * every "front"-mode output pin (speaker 0x14, headphone 0x17/0x21 when
+   * in front mode); 0x03 feeds the same pins in "rear" mode. Same
+   * hdaudio_set_control()-backed slider shape as loopback-vol above, just
+   * against these two DACs directly, initialized to their true max
+   * instead of the usual 80% default.
+   */
+  {
+    static const struct
+    {
+      unsigned char wid;
+      const char *name;
+    } dacs[] = {
+      { 0x02, "front" },
+      { 0x03, "rear" },
+    };
+    int i;
+
+    for (i = 0; i < sizeof (dacs) / sizeof (dacs[0]); i++)
+      {
+	widget_t *dac = &codec->widgets[dacs[i].wid];
+
+	if (!(dac->widget_caps & WCAP_OUTPUT_AMP_PRESENT) ||
+	    !(dac->outamp_caps & ~AMPCAP_MUTE))
+	  continue;
+
+	{
+	  int maxval = hdaudio_amp_maxval (dac->outamp_caps);
+	  int typ = (dac->widget_caps & WCAP_STEREO) ?
+	    MIXT_STEREOSLIDER16 : MIXT_MONOSLIDER16;
+	  int num = (dac->widget_caps & WCAP_STEREO) ?
+	    MIXNUM (dac, CT_OUTSTEREO, 0) : MIXNUM (dac, CT_OUTMONO, 0);
+	  int ctl;
+
+	  if ((ctl = mixer_ext_create_control (mixer->mixer_dev, top_group,
+					       num, hdaudio_set_control, typ,
+					       dacs[i].name, maxval,
+					       MIXF_READABLE |
+					       MIXF_WRITEABLE |
+					       MIXF_CENTIBEL)) < 0)
+	    cmn_err (CE_WARN,
+		     "hdaudio_lenovo_alc298_init: failed to create %s control (%d)\n",
+		     dacs[i].name, ctl);
+	  else
+	    {
+	      int val = maxval | (maxval << 16);
+
+	      hdaudio_set_control (mixer->mixer_dev, num, SNDCTL_MIX_WRITE,
+				   val);
+	    }
+	}
+      }
+  }
+
   return OSS_EAGAIN;	/* Continue with the default (generic) mixer init */
 }
 
