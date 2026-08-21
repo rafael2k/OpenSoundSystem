@@ -5632,17 +5632,19 @@ do_inputintr (int dev, int intr_flags)
        * Log once per overrun burst (not every dropped fragment inside the
        * loop below) so a capture glitch -- e.g. behind a Firefox/Zoom A/V
        * desync -- can be correlated against dmesg timestamps without
-       * flooding the log.
+       * flooding the log. Logged after the loop, once rec_overruns
+       * actually reflects this burst, so "total" isn't stale by the
+       * burst's own count.
        */
+      while (dmap->byte_counter > dmap->user_counter &&
+	     (int) (dmap->byte_counter - dmap->user_counter) > dmap->bytes_in_use)
+	{
+	  dmap->user_counter += dmap->fragment_size;
+	  dmap->rec_overruns++;
+	}
+
       cmn_err (CE_WARN, "[oss xrun] input overrun on engine %d (total=%d)\n",
 	       dev, dmap->rec_overruns);
-    }
-
-  while (dmap->byte_counter > dmap->user_counter &&
-	 (int) (dmap->byte_counter - dmap->user_counter) > dmap->bytes_in_use)
-    {
-      dmap->user_counter += dmap->fragment_size;
-      dmap->rec_overruns++;
     }
   dmap->fragment_counter = (dmap->fragment_counter + 1) % dmap->nfrags;
 
