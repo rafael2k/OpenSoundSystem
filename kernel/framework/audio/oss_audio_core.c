@@ -4225,6 +4225,24 @@ find_raw_input_space (adev_p adev, dmap_p dmap, int *dmapos)
   if (count == 0)
     count = dmap->bytes_in_use;
 
+  /*
+   * dmap->bytes_in_use is supposed to always fit inside the actual
+   * dmap->dmabuf allocation (dmap->buffsize), but some engines (e.g.
+   * vmix's per-client capture devices) derive bytes_in_use through a
+   * separate path than the one that sized dmabuf. If the two ever drift
+   * apart, handing back a dmapos/count pair based on the wrong (larger)
+   * size lets the caller copy_to_user() past the real end of dmabuf --
+   * which is a hard kernel BUG() under CONFIG_HARDENED_USERCOPY, not just
+   * a corrupted read. Clamp against the real allocation size here.
+   */
+  if (dmap->buffsize > 0)
+    {
+      if (offs >= dmap->buffsize)
+	offs %= dmap->buffsize;
+      if (offs + count > dmap->buffsize)
+	count = dmap->buffsize - offs;
+    }
+
   *dmapos = offs;
   MUTEX_EXIT_IRQRESTORE (dmap->mutex, flags);
 
@@ -4535,6 +4553,15 @@ audio_space_in_queue (adev_p adev, dmap_p dmap, int count)
 	dmap->play_underruns++;
 	if (!dmap->underrun_flag)
 	  {
+	    /*
+	     * Log once per underrun episode (not every occurrence -- this
+	     * check already latches via underrun_flag) so a glitch heard in
+	     * Firefox/Zoom can be correlated against dmesg timestamps
+	     * without flooding the log.
+	     */
+	    cmn_err (CE_WARN,
+		     "[oss xrun] output underrun on engine %d (total=%d)\n",
+		     adev->engine_num, dmap->play_underruns);
 #ifdef DO_TIMINGS
 	    oss_do_timing ("Clearing the buffer");
 #endif
@@ -5598,6 +5625,19 @@ do_inputintr (int dev, int intr_flags)
       dmap->interrupt_count++;
     }
 
+  if (dmap->byte_counter > dmap->user_counter &&
+      (int) (dmap->byte_counter - dmap->user_counter) > dmap->bytes_in_use)
+    {
+      /*
+       * Log once per overrun burst (not every dropped fragment inside the
+       * loop below) so a capture glitch -- e.g. behind a Firefox/Zoom A/V
+       * desync -- can be correlated against dmesg timestamps without
+       * flooding the log.
+       */
+      cmn_err (CE_WARN, "[oss xrun] input overrun on engine %d (total=%d)\n",
+	       dev, dmap->rec_overruns);
+    }
+
   while (dmap->byte_counter > dmap->user_counter &&
 	 (int) (dmap->byte_counter - dmap->user_counter) > dmap->bytes_in_use)
     {
@@ -5732,6 +5772,10 @@ do_outputintr (int dev, int intr_flags)
 
 	  if (!dmap->underrun_flag)
 	    {
+	      /* See the matching comment in audio_space_in_queue(). */
+	      cmn_err (CE_WARN,
+		       "[oss xrun] output underrun on engine %d (total=%d)\n",
+		       dev, dmap->play_underruns);
 #ifdef DO_TIMINGS
 	      oss_do_timing ("Clearing the buffer");
 #endif
